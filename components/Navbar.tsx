@@ -45,8 +45,8 @@ export function Navbar() {
 
         {/* Logo */}
         <a href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group">
-          <span className={`text-2xl md:text-3xl font-serif tracking-[0.2em] transition-colors group-hover:scale-105 duration-300 ${isHomePage ? 'text-accent' : 'text-black'}`}>
-            CHOICE
+          <span className={`text-2xl md:text-3xl font-bold tracking-[0.2em] transition-colors group-hover:scale-105 duration-300 ${isHomePage ? 'text-accent' : 'text-black'}`}>
+            STITCHBROS
           </span>
           <div className={`w-12 h-[1px] mt-1 transition-colors ${isHomePage ? 'bg-accent/40' : 'bg-black/20'}`}></div>
         </a>

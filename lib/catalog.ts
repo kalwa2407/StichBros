@@ -187,7 +187,7 @@ const legacyTimeline: Legacy[] = [
 export function getHomepageData() {
   return {
     brand: {
-      name: "CHOICE",
+      name: "STITCHBROS",
       tagline: "Preserving Art. Building Legacies.",
       description: "Bespoke tailoring for the modern dynasty. Every stitch is a testament to history and a declaration of authority.",
     },

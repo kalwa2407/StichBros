@@ -22,7 +22,7 @@ export function ProductGrid({ products }: { products: any[] }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12">
           {products.map((product, idx) => (
             <motion.div
               key={product.id}
@@ -65,11 +65,11 @@ export function ProductGrid({ products }: { products: any[] }) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-serif text-text group-hover:text-accent transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between">
+                    <h3 className="text-sm md:text-2xl font-serif text-text group-hover:text-accent transition-colors truncate">
                       {product.name}
                     </h3>
-                    <span className="text-accent font-medium text-lg">
+                    <span className="text-accent font-bold text-xs md:text-lg">
                       ₹{product.price.toLocaleString()}
                     </span>
                   </div>
