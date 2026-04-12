@@ -1,0 +1,29 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { CartProvider } from "@/components/CartContext";
+import { Navbar } from "@/components/Navbar";
+import { CartDrawer } from "@/components/CartDrawer";
+
+export const metadata: Metadata = {
+  title: "ChoiceMensWear | Premium Luxury Menswear",
+  description:
+    "ChoiceMensWear is a premium menswear storefront concept with editorial design, luxury collections, and a concierge-led shopping experience.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className="bg-bg text-text antialiased">
+        <CartProvider>
+          <Navbar />
+          {children}
+          <CartDrawer />
+        </CartProvider>
+      </body>
+    </html>
+  );
+}
