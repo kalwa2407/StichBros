@@ -3,23 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, Menu, Search, User } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from './CartContext';
 
 export function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { totalItems } = useCart();
+  const { totalItems, setIsOpen } = useCart();
 
   const isHomePage = pathname === '/';
   const isAdmin = pathname.startsWith('/admin');
+  const isBagPage = pathname === '/bag';
 
   useEffect(() => {
     setIsMounted(true);
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -27,63 +25,80 @@ export function Navbar() {
   if (!isMounted) return null;
   if (isAdmin) return null;
 
-  // Solid navbar for retail pages, cinematic/transparent for home
-  const navbarBg = isHomePage 
-    ? (isScrolled ? 'bg-black/90 backdrop-blur-md py-4 border-b border-white/10' : 'bg-transparent py-8')
-    : 'bg-white/95 backdrop-blur-md py-4 border-b border-gray-100 shadow-sm';
+  // Dark navbar everywhere - transparent on home hero, solid dark when scrolled
+  const navStyle: React.CSSProperties = {
+    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+    transition: 'all 0.4s ease',
+    padding: isHomePage && !isScrolled ? '28px 0' : '14px 0',
+    background: isScrolled || !isHomePage ? 'rgba(8,8,8,0.95)' : 'transparent',
+    backdropFilter: isScrolled || !isHomePage ? 'blur(12px)' : 'none',
+    borderBottom: isScrolled || !isHomePage ? '1px solid rgba(255,255,255,0.05)' : '1px solid transparent',
+  };
 
-  const textColor = isHomePage && !isScrolled ? 'text-white' : (isHomePage ? 'text-accent' : 'text-black');
-  const mutedTextColor = isHomePage && !isScrolled ? 'text-white/60' : (isHomePage ? 'text-accent/60' : 'text-gray-500');
+  // Bag page uses light bg, so navbar needs different styling there
+  if (isBagPage) {
+    navStyle.background = 'rgba(8,8,8,0.98)';
+    navStyle.backdropFilter = 'blur(12px)';
+    navStyle.borderBottom = '1px solid rgba(255,255,255,0.05)';
+  }
+
+  const linkColor = '#C5A059';
+  const mutedColor = 'rgba(255,255,255,0.5)';
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navbarBg}`}>
-      <div className="container flex items-center justify-between">
-        {/* Left Nav */}
-        <div className={`hidden md:flex items-center space-x-6 text-[9px] uppercase tracking-[0.25em] font-semibold ${mutedTextColor}`}>
-          <a href="/shop" className="hover:text-accent transition-colors">Collections</a>
-          <a href="/#legacy" className="hover:text-accent transition-colors">Our Legacy</a>
-          <a href="/shop" className="hover:text-accent transition-colors">Bespoke</a>
+    <nav style={navStyle}>
+      <div style={{ width: 'min(1400px, calc(100% - 40px))', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        
+        {/* Left Nav - Desktop */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.25em', fontWeight: 600, color: mutedColor }} className="desktop-nav">
+          <a href="/shop" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}>Collections</a>
+          <a href="/#legacy" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}>Our Legacy</a>
+          <a href="/shop" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}>Bespoke</a>
         </div>
 
         {/* Logo */}
-        <a href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group">
-          <span className={`text-2xl md:text-3xl font-bold tracking-[0.2em] transition-colors group-hover:scale-105 duration-300 ${isHomePage ? 'text-accent' : 'text-black'}`}>
+        <a href="/" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none' }}>
+          <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.2em', color: linkColor, transition: 'transform 0.3s' }}>
             STITCHBROS
           </span>
-          <div className={`w-12 h-[1px] mt-1 transition-colors ${isHomePage ? 'bg-accent/40' : 'bg-black/20'}`}></div>
+          <div style={{ width: 48, height: 1, marginTop: 4, background: 'rgba(197,160,89,0.4)' }} />
         </a>
 
         {/* Right Icons */}
-        <div className={`flex items-center space-x-6 ${mutedTextColor}`}>
-          <button className="hover:text-accent transition-colors">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, color: mutedColor }}>
+          <button style={{ color: 'inherit', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
             <Search size={20} strokeWidth={1.5} />
           </button>
-          <button className="hidden sm:block hover:text-accent transition-colors">
+          <button style={{ color: 'inherit', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} className="desktop-only">
             <User size={20} strokeWidth={1.5} />
           </button>
-          <a 
-            href="/bag"
-            className="flex items-center space-x-2 hover:text-accent transition-colors relative"
-          >
+          <button onClick={() => setIsOpen(true)} style={{ color: 'inherit', background: 'none', border: 'none', cursor: 'pointer', padding: 0, position: 'relative', display: 'flex', alignItems: 'center', gap: 8 }}>
             <ShoppingBag size={20} strokeWidth={1.5} />
-            <AnimatePresence>
-              {totalItems > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute -top-2 -right-2 bg-accent text-[8px] font-bold text-black w-4 h-4 flex items-center justify-center rounded-full"
-                >
-                  {totalItems}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </a>
-          <button className="md:hidden">
+            {totalItems > 0 && (
+              <span style={{
+                position: 'absolute', top: -8, right: -8,
+                background: '#C5A059', color: '#000', fontSize: 8, fontWeight: 700,
+                width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {totalItems}
+              </span>
+            )}
+          </button>
+          <button style={{ color: 'inherit', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} className="mobile-only">
             <Menu size={20} />
           </button>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          .desktop-nav { display: none !important; }
+          .desktop-only { display: none !important; }
+        }
+        @media (min-width: 768px) {
+          .mobile-only { display: none !important; }
+        }
+      `}</style>
     </nav>
   );
 }

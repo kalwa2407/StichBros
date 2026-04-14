@@ -274,18 +274,23 @@ const legacyTimeline: Legacy[] = [
   { year: "2024", title: "The Modern Legacy", description: "Continuing the tradition of invisible precision and visible power." }
 ];
 
-// Dynamic products store (for admin-added products)
-let dynamicProducts: Product[] = [];
-
-export function addDynamicProduct(product: Product) {
-  dynamicProducts = [...dynamicProducts, product];
+// Dynamic products - localStorage based for persistence across tabs/navigation
+function getDynamicProducts(): Product[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    return JSON.parse(localStorage.getItem('stichbros_custom_products') || '[]');
+  } catch { return []; }
 }
 
-export function getDynamicProducts() {
-  return dynamicProducts;
+export function addDynamicProduct(product: Product) {
+  if (typeof window === 'undefined') return;
+  const existing = getDynamicProducts();
+  existing.push(product);
+  localStorage.setItem('stichbros_custom_products', JSON.stringify(existing));
 }
 
 export function getHomepageData() {
+  const dynamic = getDynamicProducts();
   return {
     brand: {
       name: "STITCHBROS",
@@ -293,12 +298,12 @@ export function getHomepageData() {
       description: "Bespoke tailoring for the modern dynasty. Every stitch is a testament to history and a declaration of authority.",
     },
     collections,
-    products: [...products, ...dynamicProducts],
+    products: [...products, ...dynamic],
     legacyTimeline
   };
 }
 
 export function getProductById(id: string) {
-  const allProducts = [...products, ...dynamicProducts];
+  const allProducts = [...products, ...getDynamicProducts()];
   return allProducts.find(p => p.id === id);
 }

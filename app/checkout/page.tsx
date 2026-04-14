@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ShieldCheck, MapPin, CreditCard, CheckCircle, ArrowRight, ChevronLeft, Loader2 } from 'lucide-react';
+import { ShieldCheck, MapPin, CreditCard, CheckCircle, ArrowRight, ChevronLeft, Loader2, Pencil } from 'lucide-react';
 import { useCart } from '@/components/CartContext';
 
 export default function CheckoutPage() {
@@ -11,8 +11,19 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderId, setOrderId] = useState('');
 
+  // Editable address fields
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [phone, setPhone] = useState('');
+
   const deliveryCharges = totalPrice > 50000 ? 0 : 500;
   const finalTotal = totalPrice + deliveryCharges;
+
+  const isAddressValid = name.trim() && address.trim() && city.trim() && state.trim() && pincode.trim() && phone.trim();
 
   if (cart.length === 0 && step < 3) {
     return (
@@ -28,12 +39,13 @@ export default function CheckoutPage() {
     const newOrderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
     setOrderId(newOrderId);
 
-    // Save real order to localStorage
     const order = {
       id: newOrderId,
-      customer: 'Aman Talukdar',
-      email: 'aman@stitchbros.com',
-      destination: 'Lucknow, India',
+      customer: name,
+      email: '',
+      destination: `${city}, ${state}`,
+      address: `${address}, ${city}, ${state} - ${pincode}`,
+      phone: phone,
       items: cart.map(item => ({ name: item.name, qty: item.quantity, price: item.price, image: item.image })),
       itemCount: totalItems,
       total: finalTotal,
@@ -42,10 +54,11 @@ export default function CheckoutPage() {
       method: paymentMethod === 'card' ? 'Credit Card (Visa)' : 'UPI',
     };
 
+    // CRITICAL: Re-read localStorage at save time to avoid overwriting orders from other tabs
     try {
-      const existing = JSON.parse(localStorage.getItem('stichbros_orders') || '[]');
-      existing.unshift(order);
-      localStorage.setItem('stichbros_orders', JSON.stringify(existing));
+      const freshOrders = JSON.parse(localStorage.getItem('stichbros_orders') || '[]');
+      freshOrders.unshift(order);
+      localStorage.setItem('stichbros_orders', JSON.stringify(freshOrders));
     } catch (e) { console.error(e); }
 
     setTimeout(() => {
@@ -55,13 +68,22 @@ export default function CheckoutPage() {
     }, 2500);
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '12px 14px', background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 8, fontSize: 14, color: '#fff', outline: 'none', boxSizing: 'border-box',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 6, fontWeight: 700,
+  };
+
   const stepNames = ['Address', 'Payment', 'Success'];
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingTop: 100, paddingBottom: 80, color: '#fff', fontFamily: 'Inter, sans-serif', overflowX: 'hidden' }}>
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px', boxSizing: 'border-box' }}>
         
-        {/* Progress - mobile safe */}
+        {/* Progress */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32, flexWrap: 'wrap' }}>
           {stepNames.map((s, idx) => (
             <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -83,29 +105,45 @@ export default function CheckoutPage() {
         {/* Step 1: Address */}
         {step === 1 && (
           <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '24px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
-              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MapPin size={16} /> Delivery Address
-              </h2>
-              <button style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', border: '1px solid rgba(197,160,89,0.4)', background: 'transparent', padding: '6px 12px', cursor: 'pointer', borderRadius: 8 }}>
-                Add New
-              </button>
+            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
+              <MapPin size={16} /> Delivery Address
+            </h2>
+
+            {/* Address Form - Always visible and editable */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={labelStyle}>Full Name *</label>
+                <input style={inputStyle} value={name} onChange={e => setName(e.target.value)} placeholder="Enter your full name" />
+              </div>
+              <div>
+                <label style={labelStyle}>Address *</label>
+                <input style={inputStyle} value={address} onChange={e => setAddress(e.target.value)} placeholder="House no., Street, Locality" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={labelStyle}>City *</label>
+                  <input style={inputStyle} value={city} onChange={e => setCity(e.target.value)} placeholder="City" />
+                </div>
+                <div>
+                  <label style={labelStyle}>State *</label>
+                  <input style={inputStyle} value={state} onChange={e => setState(e.target.value)} placeholder="State" />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={labelStyle}>PIN Code *</label>
+                  <input style={inputStyle} value={pincode} onChange={e => setPincode(e.target.value)} placeholder="6-digit PIN" maxLength={6} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Mobile Number *</label>
+                  <input style={inputStyle} value={phone} onChange={e => setPhone(e.target.value)} placeholder="10-digit number" maxLength={10} />
+                </div>
+              </div>
             </div>
 
-            <div style={{ border: '1px solid rgba(197,160,89,0.3)', padding: '20px 16px', borderRadius: 12, background: 'rgba(197,160,89,0.05)', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 10, right: 10, background: '#C5A059', color: '#000', fontSize: 8, fontWeight: 700, padding: '3px 6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Default</div>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: '#fff', marginBottom: 8 }}>Aman Talukdar</h3>
-              <p style={{ fontSize: 12, color: '#999', lineHeight: 1.8, marginBottom: 12 }}>
-                42, Heritage Enclave, Civil Lines,<br />
-                Lucknow, Uttar Pradesh - 226001<br />
-                Mobile: <span style={{ color: '#fff' }}>8840658081</span>
-              </p>
-              <button style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', background: 'none', border: 'none', cursor: 'pointer' }}>Edit</button>
-            </div>
-
-            {/* Order Summary (mobile inline) */}
-            <div style={{ marginTop: 24, padding: 16, background: '#0a0a0a', borderRadius: 12, border: '1px solid rgba(255,255,255,0.03)' }}>
-              <h4 style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', fontWeight: 700, marginBottom: 12 }}>Order Summary</h4>
+            {/* Order Summary */}
+            <div style={{ marginTop: 20, padding: 14, background: '#0a0a0a', borderRadius: 12, border: '1px solid rgba(255,255,255,0.03)' }}>
+              <h4 style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', fontWeight: 700, marginBottom: 10 }}>Order Summary</h4>
               {cart.map(item => (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                   <div style={{ width: 40, height: 50, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -118,19 +156,21 @@ export default function CheckoutPage() {
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#C5A059', flexShrink: 0 }}>₹{(item.price * item.quantity).toLocaleString()}</span>
                 </div>
               ))}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12, marginTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 14, fontWeight: 700 }}>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10, marginTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 14, fontWeight: 700 }}>
                 <span>Total</span>
                 <span style={{ color: '#C5A059' }}>₹{finalTotal.toLocaleString()}</span>
               </div>
             </div>
 
-            <button onClick={() => setStep(2)} style={{
-              width: '100%', marginTop: 20, padding: 14, background: '#C5A059', color: '#000',
+            <button onClick={() => setStep(2)} disabled={!isAddressValid} style={{
+              width: '100%', marginTop: 20, padding: 14,
+              background: isAddressValid ? '#C5A059' : '#333',
+              color: isAddressValid ? '#000' : '#666',
               fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em',
-              border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              borderRadius: 8,
+              border: 'none', cursor: isAddressValid ? 'pointer' : 'not-allowed', borderRadius: 8,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
-              Deliver To This Address <ArrowRight size={14} />
+              {isAddressValid ? <>Deliver To This Address <ArrowRight size={14} /></> : 'Fill All Fields to Continue'}
             </button>
           </div>
         )}
@@ -147,7 +187,19 @@ export default function CheckoutPage() {
               </button>
             </div>
 
-            {/* Payment Options - stacked on mobile */}
+            {/* Delivering To */}
+            <div style={{ padding: '12px 14px', background: '#0a0a0a', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Delivering to</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{name}</p>
+                <p style={{ fontSize: 11, color: '#666' }}>{city}, {state} - {pincode}</p>
+              </div>
+              <button onClick={() => setStep(1)} style={{ fontSize: 10, color: '#C5A059', background: 'none', border: '1px solid rgba(197,160,89,0.3)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: 700, textTransform: 'uppercase' }}>
+                <Pencil size={10} />
+              </button>
+            </div>
+
+            {/* Payment Options */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} className="payment-grid">
               {[{ key: 'card', label: 'Credit/Debit Card' }, { key: 'upi', label: 'UPI (GPay, PhonePe)' }].map(m => (
                 <button key={m.key} onClick={() => setPaymentMethod(m.key)} style={{
@@ -161,7 +213,6 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            {/* Card Details */}
             {paymentMethod === 'card' && (
               <div style={{ padding: 16, background: '#0a0a0a', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -181,7 +232,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Total Bar */}
+            {/* Total */}
             <div style={{ padding: '12px 16px', background: 'rgba(197,160,89,0.08)', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 11, color: '#888' }}>Total Amount</span>
               <span style={{ fontSize: 18, fontWeight: 700, color: '#C5A059' }}>₹{finalTotal.toLocaleString()}</span>
@@ -210,12 +261,16 @@ export default function CheckoutPage() {
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 600, color: '#fff', marginBottom: 8 }}>Payment Successful</h2>
             <p style={{ fontSize: 13, color: '#999', maxWidth: 320, lineHeight: 1.7, marginBottom: 24 }}>
-              Your order has been placed. We'll keep you updated on shipping.
+              Thank you, <strong style={{ color: '#fff' }}>{name}</strong>! Your order has been placed. We'll keep you updated on shipping.
             </p>
             <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, padding: 20, width: '100%', maxWidth: 260, marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 10 }}>
                 <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>Order ID</span>
                 <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#C5A059' }}>{orderId}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 10 }}>
+                <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>Ship To</span>
+                <span style={{ fontSize: 11, color: '#fff' }}>{city}, {state}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>Amount</span>
