@@ -5,7 +5,6 @@ import {
   LayoutDashboard, 
   Package, 
   ShoppingBag, 
-  Users, 
   Settings, 
   LogOut, 
   Bell,
@@ -116,7 +115,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { icon: Package, label: 'Inventory', href: '/admin/inventory' },
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
     { icon: PlusCircle, label: 'Add Product', href: '/admin/add-product' },
-    { icon: Users, label: 'Customers', href: '/admin/customers' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' },
   ];
 

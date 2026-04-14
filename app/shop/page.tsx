@@ -42,8 +42,8 @@ export default function ShopPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
           <div>
-            <h1 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>STITCHBROS COLLECTION</h1>
-            <span style={{ color: '#888', fontSize: 12 }}>{filteredProducts.length} items</span>
+            <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '0.3em', color: '#C5A059' }}>S T I T C H B R O S</h1>
+            <p style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 4 }}>Collection — {filteredProducts.length} items</p>
           </div>
         </div>
 

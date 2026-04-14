@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Upload, X, Plus, Save, ImageIcon, Tag, DollarSign, FileText, Layers } from 'lucide-react';
+import { Upload, X, Plus, Save, ImageIcon, Tag, DollarSign, FileText, Layers, Percent } from 'lucide-react';
+import { addDynamicProduct } from '@/lib/catalog';
 
 export default function AddProductPage() {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Shirts');
   const [price, setPrice] = useState('');
+  const [discountPercent, setDiscountPercent] = useState('33');
   const [description, setDescription] = useState('');
   const [fabric, setFabric] = useState('');
   const [fit, setFit] = useState('');
@@ -41,25 +43,39 @@ export default function AddProductPage() {
   };
   const removeSpec = (idx: number) => setSpecs(specs.filter((_, i) => i !== idx));
 
+  const originalPrice = price ? Math.round(Number(price) / (1 - Number(discountPercent) / 100)) : 0;
+
   const handleSave = () => {
     if (!name || !price) return;
+    
     const product = {
       id: `custom-${Date.now()}`,
-      name, category, price: Number(price), description,
+      name,
+      category,
+      collection: 'sovereign',
+      price: Number(price),
       image: imagePreview || '/brand/items_mixed.png',
-      sizes, specs: specs.filter(Boolean),
+      description: description || `Premium ${category.toLowerCase()} by StitchBros.`,
+      longDescription: description || `Premium ${category.toLowerCase()} by StitchBros. Handcrafted with the finest materials.`,
+      sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL'],
+      specs: specs.filter(Boolean),
       details: [
         { label: 'Fabric', value: fabric || 'Premium' },
         { label: 'Fit', value: fit || 'Tailored' },
       ],
+      images: [imagePreview || '/brand/items_mixed.png'],
     };
+
+    // Actually add to catalog
+    addDynamicProduct(product);
+    
     setSavedProducts(prev => [...prev, product]);
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
       setName(''); setPrice(''); setDescription('');
       setFabric(''); setFit(''); setSizes([]); setSpecs(['']);
-      setImagePreview(null);
+      setImagePreview(null); setDiscountPercent('33');
     }, 2500);
   };
 
@@ -86,7 +102,7 @@ export default function AddProductPage() {
         </div>
         {saved && (
           <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', padding: '10px 20px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>
-            ✓ Product saved successfully!
+            ✓ Product added to catalog!
           </div>
         )}
       </div>
@@ -105,25 +121,33 @@ export default function AddProductPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={labelStyle}><Layers size={12} /> Category</label>
-                  <select 
-                    style={{ ...inputStyle, cursor: 'pointer', appearance: 'none' as const }}
-                    value={category} onChange={e => setCategory(e.target.value)}
-                  >
+                  <select style={{ ...inputStyle, cursor: 'pointer', appearance: 'none' as const }} value={category} onChange={e => setCategory(e.target.value)}>
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}><DollarSign size={12} /> Price (₹)</label>
-                  <input style={inputStyle} type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 45000" />
+                  <label style={labelStyle}><DollarSign size={12} /> Selling Price (₹)</label>
+                  <input style={inputStyle} type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 2999" />
                 </div>
               </div>
+
+              {/* Discount */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={labelStyle}><Percent size={12} /> Discount %</label>
+                  <input style={inputStyle} type="number" value={discountPercent} onChange={e => setDiscountPercent(e.target.value)} placeholder="e.g. 33" min="0" max="90" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Original MRP (auto)</label>
+                  <div style={{ ...inputStyle, background: 'rgba(197,160,89,0.1)', color: '#C5A059', fontWeight: 700 }}>
+                    ₹{originalPrice.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label style={labelStyle}><FileText size={12} /> Description</label>
-                <textarea 
-                  style={{ ...inputStyle, minHeight: 100, resize: 'vertical' as const }}
-                  value={description} onChange={e => setDescription(e.target.value)}
-                  placeholder="Describe the product's heritage and craftsmanship..."
-                />
+                <textarea style={{ ...inputStyle, minHeight: 100, resize: 'vertical' as const }} value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the product's heritage and craftsmanship..." />
               </div>
             </div>
           </div>
@@ -141,8 +165,6 @@ export default function AddProductPage() {
                 <input style={inputStyle} value={fit} onChange={e => setFit(e.target.value)} placeholder="e.g. Slim Tailored" />
               </div>
             </div>
-
-            {/* Specs */}
             <div style={{ marginTop: 24 }}>
               <label style={labelStyle}>Specifications</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -168,17 +190,13 @@ export default function AddProductPage() {
             <h3 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#C5A059', marginBottom: 24 }}>Available Sizes</h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
               {allSizes.map(size => (
-                <button 
-                  key={size}
-                  onClick={() => toggleSize(size)}
-                  style={{
-                    width: 48, height: 48, borderRadius: '50%', 
-                    border: sizes.includes(size) ? '2px solid #C5A059' : '1px solid rgba(255,255,255,0.1)',
-                    background: sizes.includes(size) ? 'rgba(197,160,89,0.15)' : 'transparent',
-                    color: sizes.includes(size) ? '#C5A059' : '#888',
-                    fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s',
-                  }}
-                >
+                <button key={size} onClick={() => toggleSize(size)} style={{
+                  width: 48, height: 48, borderRadius: '50%',
+                  border: sizes.includes(size) ? '2px solid #C5A059' : '1px solid rgba(255,255,255,0.1)',
+                  background: sizes.includes(size) ? 'rgba(197,160,89,0.15)' : 'transparent',
+                  color: sizes.includes(size) ? '#C5A059' : '#888',
+                  fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s',
+                }}>
                   {size}
                 </button>
               ))}
@@ -186,13 +204,11 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Right - Image Upload + Preview + Save */}
+        {/* Right - Image + Preview + Save */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, position: 'sticky', top: 120, alignSelf: 'flex-start' }}>
-          {/* Image Upload */}
           <div style={cardStyle}>
             <h3 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#C5A059', marginBottom: 24 }}>Product Image</h3>
             <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
-            
             {imagePreview ? (
               <div style={{ position: 'relative' }}>
                 <img src={imagePreview} alt="Preview" style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }} />
@@ -201,7 +217,7 @@ export default function AddProductPage() {
                 </button>
               </div>
             ) : (
-              <button onClick={() => fileRef.current?.click()} style={{ width: '100%', aspectRatio: '3/4', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer', background: 'rgba(255,255,255,0.02)', color: '#666', transition: 'all 0.2s' }}>
+              <button onClick={() => fileRef.current?.click()} style={{ width: '100%', aspectRatio: '3/4', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer', background: 'rgba(255,255,255,0.02)', color: '#666' }}>
                 <ImageIcon size={40} />
                 <span style={{ fontSize: 12, fontWeight: 600 }}>Click to upload image</span>
                 <span style={{ fontSize: 10, color: '#444' }}>JPG, PNG • Max 5MB</span>
@@ -209,44 +225,39 @@ export default function AddProductPage() {
             )}
           </div>
 
-          {/* Live Preview Card */}
+          {/* Live Preview */}
           <div style={cardStyle}>
             <h3 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#C5A059', marginBottom: 16 }}>Preview</h3>
             <div style={{ background: '#0a0a0a', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
               <div style={{ aspectRatio: '4/3', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                {imagePreview ? (
-                  <img src={imagePreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <ImageIcon size={32} color="#333" />
-                )}
+                {imagePreview ? <img src={imagePreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={32} color="#333" />}
               </div>
               <div style={{ padding: 16 }}>
                 <p style={{ fontSize: 9, color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>STITCHBROS</p>
                 <p style={{ fontSize: 13, fontWeight: 600, marginTop: 2, color: '#e5e5e5' }}>{name || 'Product Name'}</p>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#C5A059', marginTop: 6 }}>₹{price ? Number(price).toLocaleString() : '0'}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#C5A059' }}>₹{price ? Number(price).toLocaleString() : '0'}</span>
+                  {price && <span style={{ fontSize: 11, color: '#666', textDecoration: 'line-through' }}>₹{originalPrice.toLocaleString()}</span>}
+                  {price && <span style={{ fontSize: 10, color: '#22c55e', fontWeight: 700 }}>{discountPercent}% OFF</span>}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Save Button */}
-          <button 
-            onClick={handleSave}
-            disabled={!name || !price}
-            style={{
-              width: '100%', padding: 16, background: !name || !price ? '#333' : '#C5A059',
-              color: !name || !price ? '#666' : '#000', fontWeight: 700, fontSize: 12,
-              textTransform: 'uppercase', letterSpacing: '0.2em', border: 'none', borderRadius: 16,
-              cursor: !name || !price ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', gap: 8, transition: 'all 0.2s',
-            }}
-          >
-            <Save size={16} />
-            Save Product
+          <button onClick={handleSave} disabled={!name || !price} style={{
+            width: '100%', padding: 16,
+            background: !name || !price ? '#333' : '#C5A059',
+            color: !name || !price ? '#666' : '#000',
+            fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.2em',
+            border: 'none', borderRadius: 16, cursor: !name || !price ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}>
+            <Save size={16} /> Add to Catalog
           </button>
         </div>
       </div>
 
-      {/* Saved Products History */}
+      {/* Recently Added */}
       {savedProducts.length > 0 && (
         <div style={{ marginTop: 48 }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 24, color: '#C5A059' }}>
@@ -260,7 +271,7 @@ export default function AddProductPage() {
                 </div>
                 <div style={{ padding: 12 }}>
                   <p style={{ fontSize: 10, color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{p.category}</p>
-                  <p style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{p.name}</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, marginTop: 2, color: '#e5e5e5' }}>{p.name}</p>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#C5A059', marginTop: 4 }}>₹{p.price.toLocaleString()}</p>
                 </div>
               </div>
