@@ -68,7 +68,7 @@ export function Hero() {
           <p className="text-accent text-[10px] md:text-[12px] uppercase tracking-[0.5em] mb-6 font-semibold">
             The Dynasty Series
           </p>
-          <h1 className="text-4xl md:text-7xl lg:text-[9rem] font-serif leading-[0.9] mb-6 md:mb-8 text-white">
+          <h1 className="text-5xl md:text-8xl lg:text-[9rem] font-serif leading-[0.9] mb-6 md:mb-8 text-white">
             Preserving <br />
             <span className="italic text-accent">Wealth.</span>
           </h1>

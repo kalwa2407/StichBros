@@ -37,7 +37,7 @@ export function Navbar() {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navbarBg}`}>
       <div className="container flex items-center justify-between">
         {/* Left Nav */}
-        <div className={`hidden md:flex items-center space-x-8 text-[10px] uppercase tracking-[0.3em] font-bold ${mutedTextColor}`}>
+        <div className={`hidden md:flex items-center space-x-6 text-[9px] uppercase tracking-[0.25em] font-semibold ${mutedTextColor}`}>
           <a href="/shop" className="hover:text-accent transition-colors">Collections</a>
           <a href="/#legacy" className="hover:text-accent transition-colors">Our Legacy</a>
           <a href="/shop" className="hover:text-accent transition-colors">Bespoke</a>
