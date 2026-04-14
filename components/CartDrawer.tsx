@@ -1,187 +1,162 @@
 "use client";
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ArrowRight, ShoppingBag, Tag } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ArrowRight, ShoppingBag, Tag, ShieldCheck } from 'lucide-react';
 import { useCart } from './CartContext';
-import Link from 'next/link';
 
 export function CartDrawer() {
   const { cart, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
 
   const deliveryCharges = totalPrice > 50000 ? 0 : 500;
   const savings = Math.round(totalPrice * 0.33);
+  const finalTotal = totalPrice + deliveryCharges;
+
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-          />
+    <>
+      {/* Overlay */}
+      <div onClick={() => setIsOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 100 }} />
 
-          {/* Drawer */}
-          <motion.div 
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-[420px] bg-white z-[101] flex flex-col shadow-2xl"
-          >
-            {/* Header */}
-            <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-              <div className="flex items-center gap-3">
-                <ShoppingBag size={20} className="text-gray-800" />
-                <div>
-                  <h3 className="text-base font-bold text-gray-900">Shopping Bag</h3>
-                  <p className="text-[11px] text-gray-400">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
-                </div>
+      {/* Drawer */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0, width: '100%', maxWidth: 420,
+        background: '#fff', zIndex: 101, display: 'flex', flexDirection: 'column',
+        boxShadow: '-10px 0 40px rgba(0,0,0,0.3)', fontFamily: 'Inter, sans-serif',
+      }}>
+        {/* Header */}
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <ShoppingBag size={20} color="#333" />
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>Shopping Bag</h3>
+              <p style={{ fontSize: 11, color: '#999' }}>{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
+            </div>
+          </div>
+          <button onClick={() => setIsOpen(false)} style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: '#f5f5f5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Savings Banner */}
+        {cart.length > 0 && (
+          <div style={{ padding: '10px 20px', background: '#f0fdf4', borderBottom: '1px solid #dcfce7', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Tag size={14} color="#16a34a" />
+            <p style={{ fontSize: 12, color: '#15803d', fontWeight: 500 }}>
+              You save <strong>₹{savings.toLocaleString()}</strong> on this order!
+            </p>
+          </div>
+        )}
+
+        {/* Items */}
+        <div style={{ flexGrow: 1, overflowY: 'auto' }}>
+          {cart.length === 0 ? (
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                <ShoppingBag size={32} color="#d1d5db" />
               </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-500"
-              >
-                <X size={18} />
+              <h4 style={{ fontSize: 18, fontWeight: 700, color: '#111', marginBottom: 8 }}>Your bag is empty</h4>
+              <p style={{ fontSize: 13, color: '#999', marginBottom: 24 }}>Add items to get started</p>
+              <button onClick={() => setIsOpen(false)} style={{ padding: '12px 32px', background: '#C5A059', color: '#000', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', border: 'none', cursor: 'pointer' }}>
+                Continue Shopping
               </button>
             </div>
+          ) : (
+            <div>
+              {cart.map((item, idx) => (
+                <div key={item.id} style={{ padding: '16px 20px', display: 'flex', gap: 16, borderBottom: '1px solid #f5f5f5' }}>
+                  {/* Image */}
+                  <a href={`/shop/${item.id}`} onClick={() => setIsOpen(false)} style={{ flexShrink: 0 }}>
+                    <div style={{ width: 90, height: 110, background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #f0f0f0' }}>
+                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  </a>
 
-            {/* Savings Banner */}
-            {cart.length > 0 && (
-              <div className="px-4 py-2.5 bg-green-50 border-b border-green-100 flex items-center gap-2">
-                <Tag size={14} className="text-green-600" />
-                <p className="text-xs text-green-700 font-medium">
-                  You save <span className="font-bold">₹{savings.toLocaleString()}</span> on this order!
-                </p>
-              </div>
-            )}
-
-            {/* Items */}
-            <div className="flex-grow overflow-y-auto">
-              {cart.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center px-8">
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                    <ShoppingBag size={32} className="text-gray-300" />
-                  </div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-2">Your bag is empty</h4>
-                  <p className="text-sm text-gray-400 mb-6">Looks like you haven't added anything yet.</p>
-                  <button 
-                    onClick={() => setIsOpen(false)}
-                    className="px-8 py-3 bg-accent text-black font-bold text-xs uppercase tracking-widest hover:bg-[#D4B26F] transition-colors"
-                  >
-                    Continue Shopping
-                  </button>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {cart.map((item) => (
-                    <div key={item.id} className="p-4 flex gap-4 hover:bg-gray-50/50 transition-colors">
-                      {/* Product Image */}
-                      <div className="w-[90px] h-[110px] bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover" 
-                        />
+                  {/* Details */}
+                  <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 10, color: '#999', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>StitchBros</p>
+                          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</h4>
+                        </div>
+                        <button onClick={() => removeFromCart(item.id)} style={{ flexShrink: 0, width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}>
+                          <Trash2 size={14} />
+                        </button>
                       </div>
+                      <p style={{ fontSize: 10, color: '#bbb', marginTop: 2 }}>Delivery by May 24</p>
+                    </div>
 
-                      {/* Product Details */}
-                      <div className="flex-grow min-w-0 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">StichBros</p>
-                              <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
-                            </div>
-                            <button 
-                              onClick={() => removeFromCart(item.id)}
-                              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                          <p className="text-[10px] text-gray-400 mt-0.5">Hand-crafted Legacy</p>
-                        </div>
-
-                        <div className="flex items-end justify-between mt-3">
-                          {/* Quantity Controls */}
-                          <div className="flex items-center border border-gray-200 rounded-full overflow-hidden">
-                            <button 
-                              onClick={() => updateQuantity(item.id, -1)}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 transition-colors"
-                            >
-                              <Minus size={12} />
-                            </button>
-                            <span className="w-8 text-center text-xs font-bold text-gray-900">{item.quantity}</span>
-                            <button 
-                              onClick={() => updateQuantity(item.id, 1)}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 transition-colors"
-                            >
-                              <Plus size={12} />
-                            </button>
-                          </div>
-
-                          {/* Price */}
-                          <div className="text-right">
-                            <p className="text-sm font-bold text-gray-900">₹{item.price.toLocaleString()}</p>
-                            <p className="text-[10px] text-gray-400 line-through">₹{(item.price * 1.5).toLocaleString()}</p>
-                          </div>
-                        </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 12 }}>
+                      {/* Quantity */}
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e5e7eb', borderRadius: 999, overflow: 'hidden' }}>
+                        <button onClick={() => updateQuantity(item.id, -1)} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+                          <Minus size={12} />
+                        </button>
+                        <span style={{ width: 32, textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#111' }}>{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, 1)} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                      {/* Price */}
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>₹{(item.price * item.quantity).toLocaleString()}</p>
+                        <p style={{ fontSize: 10, color: '#bbb', textDecoration: 'line-through' }}>₹{Math.round(item.price * 1.5 * item.quantity).toLocaleString()}</p>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        {cart.length > 0 && (
+          <div style={{ borderTop: '1px solid #e5e7eb', background: '#fafafa' }}>
+            {/* Price Summary */}
+            <div style={{ padding: '16px 20px', fontSize: 13 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
+                <span>Subtotal ({totalItems} items)</span>
+                <span>₹{totalPrice.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
+                <span>Delivery</span>
+                <span style={{ color: deliveryCharges === 0 ? '#16a34a' : '#666', fontWeight: deliveryCharges === 0 ? 600 : 400 }}>
+                  {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges}`}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: '#111', fontSize: 16, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
+                <span>Total</span>
+                <span>₹{finalTotal.toLocaleString()}</span>
+              </div>
             </div>
 
-            {/* Footer / Price Summary */}
-            {cart.length > 0 && (
-              <div className="border-t border-gray-200 bg-gray-50">
-                {/* Price Details */}
-                <div className="px-4 py-4 space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-500">
-                    <span>Subtotal ({totalItems} items)</span>
-                    <span>₹{totalPrice.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-500">
-                    <span>Delivery</span>
-                    <span className={deliveryCharges === 0 ? 'text-green-600 font-medium' : ''}>
-                      {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-200">
-                    <span>Total</span>
-                    <span>₹{(totalPrice + deliveryCharges).toLocaleString()}</span>
-                  </div>
-                </div>
+            {/* CTAs */}
+            <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <a href="/checkout" onClick={() => setIsOpen(false)} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '14px', background: '#C5A059', color: '#000', fontWeight: 700,
+                fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', textDecoration: 'none',
+              }}>
+                Proceed to Checkout <ArrowRight size={14} />
+              </a>
+              <a href="/bag" onClick={() => setIsOpen(false)} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '12px', border: '1px solid #d1d5db', color: '#555', fontWeight: 600,
+                fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', textDecoration: 'none',
+              }}>
+                View Bag
+              </a>
+            </div>
 
-                {/* CTA Buttons */}
-                <div className="px-4 pb-4 space-y-2">
-                  <Link 
-                     href="/checkout"
-                     onClick={() => setIsOpen(false)}
-                     className="flex items-center justify-center w-full py-3.5 bg-accent text-black font-bold text-xs uppercase tracking-widest hover:bg-[#D4B26F] transition-colors gap-2"
-                  >
-                     Proceed to Checkout
-                     <ArrowRight size={14} />
-                  </Link>
-                  <Link
-                     href="/bag"
-                     onClick={() => setIsOpen(false)}
-                     className="flex items-center justify-center w-full py-3 border border-gray-300 text-gray-700 font-semibold text-xs uppercase tracking-widest hover:border-gray-500 transition-colors"
-                  >
-                     View Bag
-                  </Link>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            {/* Trust */}
+            <div style={{ padding: '0 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#bbb', fontSize: 10 }}>
+              <ShieldCheck size={12} /> 100% Secure Payments
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

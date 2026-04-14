@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, MapPin, CreditCard, CheckCircle, ArrowRight, ChevronLeft, Loader2 } from 'lucide-react';
 import { useCart } from '@/components/CartContext';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const { cart, totalPrice, clearCart } = useCart();
-  const router = useRouter();
-  const [step, setStep] = useState(1); // 1: Address, 2: Payment, 3: Success
+  const { cart, totalPrice, clearCart, totalItems } = useCart();
+  const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
 
@@ -19,9 +15,9 @@ export default function CheckoutPage() {
 
   if (cart.length === 0 && step < 3) {
     return (
-      <div className="min-h-screen bg-bg pt-48 text-center text-white flex flex-col items-center">
-         <h2 className="text-xl font-serif mb-4">Your collection is empty.</h2>
-         <Link href="/shop" className="button-outline">Return to Shop</Link>
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingTop: 200, textAlign: 'center', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+        <h2 style={{ fontSize: 20, marginBottom: 16 }}>Your collection is empty.</h2>
+        <a href="/shop" style={{ color: '#C5A059', textDecoration: 'underline' }}>Return to Shop</a>
       </div>
     );
   }
@@ -35,238 +31,205 @@ export default function CheckoutPage() {
     }, 2500);
   };
 
+  const stepNames = ['Address', 'Payment', 'Success'];
+
   return (
-    <div className="min-h-screen bg-bg pt-28 md:pt-32 pb-24 text-white">
-      <div className="container max-w-5xl mx-auto px-4 md:px-6">
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingTop: 110, paddingBottom: 80, color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px' }}>
         
-        {/* Progress Header */}
-        <div className="flex items-center justify-center mb-12 space-x-4 md:space-x-12">
-           {['Address', 'Payment', 'Success'].map((s, idx) => (
-             <div key={s} className="flex items-center space-x-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step >= idx + 1 ? 'bg-accent text-black shadow-[0_0_15px_rgba(212,178,111,0.5)]' : 'bg-surface text-text-muted border border-line'}`}>
-                   {idx + 1}
-                </div>
-                <span className={`text-[10px] uppercase tracking-widest font-bold transition-colors ${step >= idx + 1 ? 'text-accent' : 'text-text-muted'}`}>{s}</span>
-                {idx < 2 && <div className={`w-8 md:w-16 h-[1px] ${step >= idx + 2 ? 'bg-accent' : 'bg-line'} hidden md:block transition-colors`}></div>}
-             </div>
-           ))}
+        {/* Progress */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 48 }}>
+          {stepNames.map((s, idx) => (
+            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 700,
+                background: step >= idx + 1 ? '#C5A059' : '#1a1a1a',
+                color: step >= idx + 1 ? '#000' : '#666',
+                border: step >= idx + 1 ? 'none' : '1px solid rgba(255,255,255,0.1)',
+              }}>
+                {idx + 1}
+              </div>
+              <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, color: step >= idx + 1 ? '#C5A059' : '#666' }}>{s}</span>
+              {idx < 2 && <div style={{ width: 40, height: 1, background: step >= idx + 2 ? '#C5A059' : 'rgba(255,255,255,0.1)' }} />}
+            </div>
+          ))}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
-          <main className="flex-grow w-full">
-            <AnimatePresence mode="wait">
-              {step === 1 && (
-                <motion.div 
-                  key="address"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="bg-surface/50 p-5 md:p-8 border border-line rounded-2xl shadow-2xl backdrop-blur-sm space-y-6 md:space-y-8"
-                >
-                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <h2 className="text-sm font-bold text-accent uppercase tracking-wider flex items-center">
-                         <MapPin size={18} className="mr-2" /> Delivery Address
-                      </h2>
-                      <button className="text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/50 px-3 py-1.5 md:px-4 md:py-2 hover:bg-accent hover:text-black transition-colors rounded-lg">
-                        Add New Address
-                      </button>
-                   </div>
+        <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }} className="checkout-layout">
+          {/* Main */}
+          <div style={{ flexGrow: 1 }}>
+            {/* Step 1: Address */}
+            {step === 1 && (
+              <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 32 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                  <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <MapPin size={18} /> Delivery Address
+                  </h2>
+                  <button style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', border: '1px solid rgba(197,160,89,0.4)', background: 'transparent', padding: '8px 16px', cursor: 'pointer', borderRadius: 8 }}>
+                    Add New
+                  </button>
+                </div>
 
-                   <div className="border border-accent p-6 rounded-xl relative bg-accent/5">
-                      <div className="absolute top-4 right-4 bg-accent text-black text-[9px] font-bold px-2 py-1 rounded-sm uppercase tracking-widest">Default</div>
-                      <h3 className="font-serif text-lg mb-2 text-white">Aman Talukdar</h3>
-                      <p className="text-xs text-text-muted leading-relaxed max-w-sm mb-4">
-                         42, Heritage Enclave, Civil Lines,<br />
-                         Lucknow, Uttar Pradesh - 226001<br />
-                         Mobile: <span className="text-white font-medium">8840658081</span>
-                      </p>
-                      <div className="flex space-x-6">
-                         <button className="text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-white transition-colors">Edit</button>
-                      </div>
-                   </div>
+                <div style={{ border: '1px solid rgba(197,160,89,0.3)', padding: 24, borderRadius: 12, background: 'rgba(197,160,89,0.05)', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 12, right: 12, background: '#C5A059', color: '#000', fontSize: 9, fontWeight: 700, padding: '4px 8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Default</div>
+                  <h3 style={{ fontSize: 16, fontWeight: 600, color: '#fff', marginBottom: 8 }}>Aman Talukdar</h3>
+                  <p style={{ fontSize: 13, color: '#999', lineHeight: 1.8, maxWidth: 300, marginBottom: 12 }}>
+                    42, Heritage Enclave, Civil Lines,<br />
+                    Lucknow, Uttar Pradesh - 226001<br />
+                    Mobile: <span style={{ color: '#fff' }}>8840658081</span>
+                  </p>
+                  <button style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', background: 'none', border: 'none', cursor: 'pointer' }}>Edit</button>
+                </div>
 
-                   <button 
-                     onClick={() => setStep(2)}
-                     className="button-premium w-full group flex justify-center items-center"
-                   >
-                     Deliver To This Address
-                     <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                   </button>
-                </motion.div>
-              )}
+                <button onClick={() => setStep(2)} style={{
+                  width: '100%', marginTop: 24, padding: 16, background: '#C5A059', color: '#000',
+                  fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em',
+                  border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                  Deliver To This Address <ArrowRight size={16} />
+                </button>
+              </div>
+            )}
 
-              {step === 2 && (
-                <motion.div 
-                  key="payment"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="bg-surface/50 p-8 border border-line rounded-2xl shadow-2xl backdrop-blur-sm space-y-8"
-                >
-                   <div className="flex items-center justify-between border-b border-line pb-6">
-                      <h2 className="text-sm font-bold text-accent uppercase tracking-wider flex items-center">
-                         <CreditCard size={18} className="mr-2" /> Payment Method
-                      </h2>
-                      <button onClick={() => setStep(1)} className="text-[10px] uppercase tracking-widest flex items-center text-text-muted hover:text-white group">
-                         <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform mr-1" /> Back
-                      </button>
-                   </div>
+            {/* Step 2: Payment */}
+            {step === 2 && (
+              <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 20, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C5A059', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <CreditCard size={18} /> Payment Method
+                  </h2>
+                  <button onClick={() => setStep(1)} style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <ChevronLeft size={14} /> Back
+                  </button>
+                </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {['card', 'upi'].map((m) => (
-                        <button 
-                          key={m}
-                          onClick={() => setPaymentMethod(m)}
-                          className={`p-6 border rounded-xl cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${paymentMethod === m ? 'border-accent bg-accent/10 shadow-[0_0_15px_rgba(212,178,111,0.15)]' : 'border-line hover:border-white/20'}`}
-                        >
-                           {m === 'card' ? <CreditCard size={24} className={paymentMethod === m ? 'text-accent' : 'text-text-muted'} /> : <svg className={`w-6 h-6 ${paymentMethod === m ? 'text-accent' : 'text-text-muted'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>}
-                           <p className={`text-[11px] font-bold uppercase tracking-widest ${paymentMethod === m ? 'text-accent' : 'text-text-muted'}`}>
-                             {m === 'card' ? 'Credit/Debit Card' : 'UPI (GPay, PhonePe)'}
-                           </p>
-                        </button>
-                      ))}
-                   </div>
+                {/* Payment Options */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {[{ key: 'card', label: 'Credit/Debit Card' }, { key: 'upi', label: 'UPI (GPay, PhonePe)' }].map(m => (
+                    <button key={m.key} onClick={() => setPaymentMethod(m.key)} style={{
+                      padding: 24, border: paymentMethod === m.key ? '1px solid #C5A059' : '1px solid rgba(255,255,255,0.05)',
+                      background: paymentMethod === m.key ? 'rgba(197,160,89,0.1)' : 'transparent',
+                      borderRadius: 12, cursor: 'pointer', textAlign: 'center',
+                    }}>
+                      <CreditCard size={24} color={paymentMethod === m.key ? '#C5A059' : '#666'} style={{ margin: '0 auto 8px' }} />
+                      <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: paymentMethod === m.key ? '#C5A059' : '#888' }}>{m.label}</p>
+                    </button>
+                  ))}
+                </div>
 
-                   {paymentMethod === 'card' && (
-                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4">
-                       <div className="p-6 bg-black rounded-xl border border-line space-y-4 relative overflow-hidden group hover:border-accent/50 transition-colors">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                          <div className="flex items-center space-x-4 relative z-10">
-                             <div className="w-12 h-8 bg-gradient-to-r from-gray-200 to-white rounded flex items-center justify-center">
-                               <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />
-                             </div>
-                             <span className="text-sm font-medium font-mono text-white tracking-widest">**** **** **** 4081</span>
-                              <span className="text-[10px] text-accent font-bold uppercase ml-auto tracking-widest border border-accent/30 px-2 py-1 rounded">Saved</span>
-                          </div>
-                          <div className="relative z-10">
-                             <label className="text-[10px] text-text-muted uppercase tracking-widest mb-2 block">Security Code</label>
-                             <input 
-                               type="password" 
-                               placeholder="CVV" 
-                               className="w-1/3 p-3 bg-white/5 border border-line rounded-lg text-sm text-white focus:border-accent outline-none font-mono tracking-widest transition-colors"
-                               maxLength={3}
-                             />
-                          </div>
-                       </div>
-                     </motion.div>
-                   )}
+                {/* Card Details */}
+                {paymentMethod === 'card' && (
+                  <div style={{ padding: 24, background: '#0a0a0a', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                      <div style={{ width: 48, height: 32, background: '#fff', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#000' }}>VISA</div>
+                      <span style={{ fontSize: 14, fontFamily: 'monospace', letterSpacing: '0.2em', color: '#fff' }}>**** **** **** 4081</span>
+                      <span style={{ marginLeft: 'auto', fontSize: 9, color: '#C5A059', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', border: '1px solid rgba(197,160,89,0.3)', padding: '4px 8px', borderRadius: 4 }}>Saved</span>
+                    </div>
+                    <label style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 8 }}>Security Code</label>
+                    <input type="password" placeholder="CVV" maxLength={3} style={{ width: 120, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff', fontSize: 14, outline: 'none', fontFamily: 'monospace', letterSpacing: '0.3em' }} />
+                  </div>
+                )}
 
-                   {paymentMethod === 'upi' && (
-                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4">
-                        <div className="p-6 bg-black rounded-xl border border-line">
-                           <label className="text-[10px] text-text-muted uppercase tracking-widest mb-2 block">Enter UPI ID</label>
-                           <input 
-                             type="text" 
-                             placeholder="username@upi" 
-                             className="w-full p-4 bg-white/5 border border-line rounded-lg text-sm text-white focus:border-accent outline-none transition-colors"
-                           />
-                        </div>
-                     </motion.div>
-                   )}
+                {paymentMethod === 'upi' && (
+                  <div style={{ padding: 24, background: '#0a0a0a', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <label style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 8 }}>Enter UPI ID</label>
+                    <input type="text" placeholder="username@upi" style={{ width: '100%', padding: '14px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                )}
 
-                   <button 
-                     onClick={handlePayment}
-                     disabled={isProcessing}
-                     className="button-premium w-full flex items-center justify-center relative overflow-hidden disabled:opacity-80"
-                   >
-                     {isProcessing ? (
-                       <span className="flex items-center">
-                          <Loader2 size={18} className="animate-spin mr-2" /> Processing Securely...
-                       </span>
-                     ) : (
-                       <span className="flex items-center">
-                          <ShieldCheck size={18} className="mr-2" /> Pay ₹{finalTotal.toLocaleString()}
-                       </span>
-                     )}
-                   </button>
-                </motion.div>
-              )}
+                <button onClick={handlePayment} disabled={isProcessing} style={{
+                  width: '100%', padding: 16, background: isProcessing ? '#888' : '#C5A059', color: '#000',
+                  fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em',
+                  border: 'none', cursor: isProcessing ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                  {isProcessing ? (
+                    <><Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing Securely...</>
+                  ) : (
+                    <><ShieldCheck size={18} /> Pay ₹{finalTotal.toLocaleString()}</>
+                  )}
+                </button>
+              </div>
+            )}
 
-              {step === 3 && (
-                <motion.div 
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className="bg-surface/50 p-12 border border-line rounded-2xl shadow-2xl backdrop-blur-sm text-center flex flex-col items-center"
-                >
-                   <div className="relative mb-8">
-                     <div className="absolute inset-0 bg-green-500/20 blur-xl rounded-full"></div>
-                     <motion.div 
-                       initial={{ scale: 0 }} 
-                       animate={{ scale: 1 }} 
-                       transition={{ type: 'spring', delay: 0.2 }}
-                       className="w-24 h-24 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center relative z-10 text-green-500"
-                     >
-                        <CheckCircle size={48} strokeWidth={1.5} />
-                     </motion.div>
-                   </div>
-                   
-                   <h2 className="text-3xl font-serif text-white mb-4">Payment Successful</h2>
-                   <p className="text-text-muted text-sm max-w-md leading-relaxed mb-8">
-                      Your order has been securely processed. Our concierge will be in touch with shipping updates.
-                   </p>
-                   
-                   <div className="bg-black/50 border border-line rounded-xl p-6 w-full max-w-xs mb-8 space-y-3">
-                      <div className="flex justify-between items-center border-b border-line pb-3">
-                         <span className="text-[10px] uppercase tracking-widest text-text-muted">Order ID</span>
-                         <span className="text-xs font-mono text-accent">CH-{(Math.random() * 1000000).toFixed(0)}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                         <span className="text-[10px] uppercase tracking-widest text-text-muted">Amount</span>
-                         <span className="text-xs font-serif text-white">₹{finalTotal.toLocaleString()}</span>
-                      </div>
-                   </div>
+            {/* Step 3: Success */}
+            {step === 3 && (
+              <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 48, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <CheckCircle size={48} color="#22c55e" strokeWidth={1.5} />
+                </div>
+                <h2 style={{ fontSize: 28, fontWeight: 600, color: '#fff', marginBottom: 12 }}>Payment Successful</h2>
+                <p style={{ fontSize: 14, color: '#999', maxWidth: 400, lineHeight: 1.7, marginBottom: 32 }}>
+                  Your order has been securely processed. Our concierge will be in touch with shipping updates.
+                </p>
+                <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 280, marginBottom: 32 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 12 }}>
+                    <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>Order ID</span>
+                    <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#C5A059' }}>CH-{Math.floor(Math.random() * 1000000)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>Amount</span>
+                    <span style={{ fontSize: 12, color: '#fff' }}>₹{finalTotal.toLocaleString()}</span>
+                  </div>
+                </div>
+                <a href="/shop" style={{ padding: '14px 32px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+                  Return to Collections
+                </a>
+              </div>
+            )}
+          </div>
 
-                   <Link href="/shop" className="button-outline">
-                      Return to Collections
-                   </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </main>
-
-          {/* Right Sidebar - Summary */}
+          {/* Sidebar Summary */}
           {step < 3 && (
-            <aside className="w-full lg:w-[420px] flex-shrink-0 space-y-6 lg:sticky lg:top-32">
-              <div className="bg-[#121212] p-5 md:p-8 border border-white/5 rounded-2xl md:rounded-[2rem] shadow-2xl backdrop-blur-sm">
-                 <h3 className="text-[10px] uppercase tracking-widest font-bold text-accent mb-6 pb-4 border-b border-line flex items-center">
-                    <ShieldCheck size={14} className="mr-2" /> Secure Selection
-                 </h3>
-                 
-                 <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                    {cart.map(item => (
-                      <div key={item.id} className="flex space-x-4 items-center border-b border-line/50 pb-4 last:border-0 last:pb-0">
-                         <div className="w-16 h-20 md:w-20 md:h-24 bg-[#0a0a0a] rounded-lg flex-shrink-0 border border-white/10 overflow-hidden flex items-center justify-center p-1.5">
-                            <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
-                         </div>
-                         <div className="flex-grow min-w-0">
-                            <p className="font-bold text-[11px] leading-tight uppercase tracking-widest text-white mb-1">{item.name}</p>
-                            <p className="text-[10px] text-text-muted uppercase tracking-widest mb-2">Qty: {item.quantity}</p>
-                            <p className="font-serif italic text-accent text-sm">₹{item.price.toLocaleString()}</p>
-                         </div>
+            <aside style={{ width: 380, flexShrink: 0, position: 'sticky', top: 100 }} className="checkout-sidebar">
+              <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 24 }}>
+                <h3 style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700, color: '#C5A059', marginBottom: 20, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <ShieldCheck size={14} /> Secure Selection
+                </h3>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20, maxHeight: '40vh', overflowY: 'auto' }}>
+                  {cart.map(item => (
+                    <div key={item.id} style={{ display: 'flex', gap: 16, alignItems: 'center', paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <div style={{ width: 64, height: 80, background: '#0a0a0a', borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
-                    ))}
-                 </div>
-                 
-                 <div className="space-y-4 pt-6 border-t border-line text-xs font-medium">
-                    <div className="flex justify-between text-text-muted">
-                       <span className="uppercase tracking-widest text-[10px]">Subtotal</span>
-                       <span>₹{totalPrice.toLocaleString()}</span>
+                      <div>
+                        <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#fff', marginBottom: 4 }}>{item.name}</p>
+                        <p style={{ fontSize: 10, color: '#888' }}>Qty: {item.quantity}</p>
+                        <p style={{ fontSize: 13, fontStyle: 'italic', color: '#C5A059', marginTop: 4 }}>₹{item.price.toLocaleString()}</p>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-text-muted">
-                       <span className="uppercase tracking-widest text-[10px]">Shipping</span>
-                       <span className="text-accent">{deliveryCharges === 0 ? 'Complimentary' : `₹${deliveryCharges}`}</span>
-                    </div>
-                    <div className="flex justify-between text-lg font-serif pt-4 border-t border-line text-white">
-                       <span>Total</span>
-                       <span className="text-accent">₹{finalTotal.toLocaleString()}</span>
-                    </div>
-                 </div>
+                  ))}
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                    <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Subtotal</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                    <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Shipping</span>
+                    <span style={{ color: '#C5A059' }}>{deliveryCharges === 0 ? 'Complimentary' : `₹${deliveryCharges}`}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 700, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <span>Total</span>
+                    <span style={{ color: '#C5A059' }}>₹{finalTotal.toLocaleString()}</span>
+                  </div>
+                </div>
               </div>
             </aside>
           )}
         </div>
       </div>
+
+      <style>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @media (max-width: 1023px) {
+          .checkout-sidebar { display: none !important; }
+          .checkout-layout { flex-direction: column !important; }
+        }
+      `}</style>
     </div>
   );
 }

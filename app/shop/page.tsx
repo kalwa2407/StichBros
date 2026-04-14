@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, ChevronDown, ShoppingBag, Heart, X, SlidersHorizontal } from 'lucide-react';
 import { getHomepageData } from '@/lib/catalog';
 import { useCart } from '@/components/CartContext';
@@ -13,10 +12,10 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [showSort, setShowSort] = useState(false);
 
   const categories = useMemo(() => {
-    const cats = ['All', ...new Set(data.products.map(p => p.category))];
-    return cats;
+    return ['All', ...new Set(data.products.map(p => p.category))];
   }, [data.products]);
 
   const filteredProducts = useMemo(() => {
@@ -24,218 +23,168 @@ export default function ShopPage() {
     if (selectedCategory !== 'All') {
       result = result.filter(p => p.category === selectedCategory);
     }
-    if (sortBy === 'Price: Low to High') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'Price: High to Low') {
-      result.sort((a, b) => b.price - a.price);
-    }
+    if (sortBy === 'Price: Low to High') result.sort((a, b) => a.price - b.price);
+    else if (sortBy === 'Price: High to Low') result.sort((a, b) => b.price - a.price);
     return result;
   }, [selectedCategory, sortBy, data.products]);
 
   return (
-    <div className="min-h-screen bg-white pt-24 md:pt-32 pb-24 text-black">
-      <div className="container max-w-[1400px]">
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingTop: 100, paddingBottom: 100, color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ width: 'min(1400px, calc(100% - 40px))', margin: '0 auto' }}>
+        
         {/* Breadcrumbs */}
-        <nav className="text-[10px] md:text-[11px] mb-4 md:mb-8 flex items-center space-x-2 text-gray-400 font-medium">
-          <a href="/" className="hover:text-black">Home</a>
+        <nav style={{ fontSize: 11, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8, color: '#666' }}>
+          <a href="/" style={{ color: '#666', textDecoration: 'none' }}>Home</a>
           <span>/</span>
-          <span className="text-black font-bold">Clothing</span>
+          <span style={{ color: '#C5A059', fontWeight: 700 }}>Clothing</span>
         </nav>
 
-        <div className="flex items-center justify-between mb-8">
-           <div className="flex flex-col md:flex-row md:items-center md:space-x-2">
-              <h1 className="text-base md:text-lg font-bold uppercase tracking-widest">STITCHBROS COLLECTION</h1>
-              <span className="text-gray-400 text-xs font-normal"> - {filteredProducts.length} items</span>
-           </div>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+          <div>
+            <h1 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>STITCHBROS COLLECTION</h1>
+            <span style={{ color: '#888', fontSize: 12 }}>{filteredProducts.length} items</span>
+          </div>
         </div>
 
-        <div className="flex border-t border-gray-100">
-          {/* Desktop Filters Sidebar */}
-          <aside className="w-64 flex-shrink-0 pt-8 pr-8 border-r border-gray-100 hidden lg:block">
-            <div className="sticky top-32 space-y-10">
-              <div>
-                <h3 className="text-xs font-bold uppercase mb-6 tracking-widest text-gray-400 border-b border-gray-50 pb-2">Categories</h3>
-                <div className="space-y-4">
-                  {categories.map(cat => (
-                    <label key={cat} className="flex items-center space-x-3 cursor-pointer group">
-                      <input 
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === cat}
-                        onChange={() => setSelectedCategory(cat)}
-                        className="w-4 h-4 accent-accent"
-                      />
-                      <span className={`text-sm tracking-wide transition-colors ${selectedCategory === cat ? 'text-black font-bold' : 'text-gray-500 group-hover:text-black'}`}>
-                        {cat}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-bold uppercase mb-6 tracking-widest text-gray-400 border-b border-gray-50 pb-2">Price Range</h3>
-                <div className="space-y-4 text-sm text-gray-500">
-                   {['Below ₹10,000', '₹10,000 - ₹30,000', 'Above ₹50,000'].map(range => (
-                     <label key={range} className="flex items-center space-x-3 cursor-pointer group">
-                       <input type="checkbox" className="w-4 h-4 accent-accent" />
-                       <span className="group-hover:text-black transition-colors">{range}</span>
-                     </label>
-                   ))}
-                </div>
+        <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          {/* Desktop Sidebar */}
+          <aside style={{ width: 240, flexShrink: 0, paddingTop: 32, paddingRight: 32, borderRight: '1px solid rgba(255,255,255,0.05)', display: 'none' }} className="lg-sidebar">
+            <div>
+              <h3 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#666', marginBottom: 20 }}>Categories</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {categories.map(cat => (
+                  <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                    <input type="radio" name="category" checked={selectedCategory === cat} onChange={() => setSelectedCategory(cat)} style={{ accentColor: '#C5A059' }} />
+                    <span style={{ fontSize: 13, color: selectedCategory === cat ? '#fff' : '#888', fontWeight: selectedCategory === cat ? 700 : 400 }}>{cat}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-grow pt-4 md:pt-8 lg:pl-10">
-            {/* Desktop Sort */}
-            <div className="hidden lg:flex justify-end mb-10">
-              <div className="relative group border border-gray-200 px-6 py-3 hover:bg-gray-50 cursor-pointer min-w-[220px]">
-                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest">
-                  <span className="text-gray-400">Sort: </span>
-                  <span className="text-black flex items-center">{sortBy} <ChevronDown size={14} className="ml-2 text-accent" /></span>
+          {/* Main */}
+          <main style={{ flexGrow: 1, paddingTop: 16 }}>
+            {/* Sort (desktop) */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24, position: 'relative' }}>
+              <button onClick={() => setShowSort(!showSort)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer' }}>
+                Sort: {sortBy} <ChevronDown size={14} />
+              </button>
+              {showSort && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, background: '#121212', border: '1px solid rgba(255,255,255,0.1)', zIndex: 30, minWidth: 200 }}>
+                  {['Newest', 'Price: Low to High', 'Price: High to Low'].map(s => (
+                    <button key={s} onClick={() => { setSortBy(s); setShowSort(false); }} style={{ display: 'block', width: '100%', padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: sortBy === s ? '#C5A059' : '#888', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
+                      {s}
+                    </button>
+                  ))}
                 </div>
-                <div className="absolute top-full right-[-1px] left-[-1px] bg-white border border-gray-200 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-30">
-                   {['Newest', 'Price: Low to High', 'Price: High to Low'].map(s => (
-                     <button 
-                       key={s} 
-                       onClick={() => setSortBy(s)}
-                       className="w-full px-6 py-4 text-left text-[11px] font-bold uppercase tracking-widest hover:bg-accent/5 transition-colors border-b border-gray-50 last:border-0"
-                     >
-                       {s}
-                     </button>
-                   ))}
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Mobile Filter Floating Trigger */}
-            <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex items-center bg-black text-white px-8 py-4 rounded-full shadow-2xl space-x-4 border border-accent/20">
-               <button onClick={() => setIsFilterOpen(true)} className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.2em]">
-                  <SlidersHorizontal size={14} />
-                  <span>Filter & Sort</span>
-               </button>
+            {/* Category Pills (mobile) */}
+            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 24, paddingBottom: 8 }}>
+              {categories.map(cat => (
+                <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
+                  padding: '8px 20px', borderRadius: 999, fontSize: 10, fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'nowrap',
+                  cursor: 'pointer', border: 'none',
+                  background: selectedCategory === cat ? '#C5A059' : 'rgba(255,255,255,0.05)',
+                  color: selectedCategory === cat ? '#000' : '#888',
+                }}>
+                  {cat}
+                </button>
+              ))}
             </div>
 
-            {/* Myntra-Style Grid - 2 Col on Mobile, 4 Col on Desktop */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5 pb-24">
-              <AnimatePresence mode="popLayout">
-                {filteredProducts.map((product) => (
-                  <motion.div
-                    key={product.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="group"
-                  >
-                    <a href={`/shop/${product.id}`} className="block">
-                      {/* Image Container */}
-                      <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden border border-transparent group-hover:border-accent transition-all duration-300">
-                        <img 
-                          src={product.image} 
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        
-                        {/* Tags */}
-                        {product.price > 50000 && (
-                           <div className="absolute top-3 left-3 bg-black text-accent px-2 py-1 text-[8px] font-bold uppercase tracking-widest">Premium</div>
-                        )}
+            {/* Product Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, paddingBottom: 80 }} className="shop-grid">
+              {filteredProducts.map((product) => (
+                <div key={product.id}>
+                  <a href={`/shop/${product.id}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{ position: 'relative', aspectRatio: '3/4', background: '#1a1a1a', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }} />
+                      
+                      {product.price > 50000 && (
+                        <div style={{ position: 'absolute', top: 12, left: 12, background: '#000', color: '#C5A059', padding: '4px 8px', fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Premium</div>
+                      )}
 
-                        {/* Quick View / Bag on Desktop */}
-                        <div className="hidden md:block absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-xl z-20">
-                          <button 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              addToCart(product);
-                            }}
-                            className="w-full py-3 bg-accent text-black text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center space-x-2"
-                          >
-                            <ShoppingBag size={14} />
-                            <span>Add to Bag</span>
-                          </button>
-                        </div>
-                      </div>
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }} style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px', background: 'rgba(197,160,89,0.95)',
+                        color: '#000', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em',
+                        border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      }}>
+                        <ShoppingBag size={14} /> Add to Bag
+                      </button>
+                    </div>
 
-                      {/* Info */}
-                      <div className="pt-4 space-y-1.5 px-1">
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">STITCHBROS</h4>
-                        <h3 className="text-black text-[11px] md:text-xs font-medium truncate">{product.name}</h3>
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm md:text-base font-bold font-serif text-accent">₹{product.price.toLocaleString()}</span>
-                          <span className="text-[9px] md:text-[10px] text-gray-400 line-through font-light italic">₹{(product.price * 1.5).toLocaleString()}</span>
-                        </div>
+                    <div style={{ paddingTop: 12 }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#888', marginBottom: 2 }}>STITCHBROS</p>
+                      <h3 style={{ fontSize: 12, fontWeight: 500, color: '#e5e5e5', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#C5A059' }}>₹{product.price.toLocaleString()}</span>
+                        <span style={{ fontSize: 10, color: '#666', textDecoration: 'line-through' }}>₹{Math.round(product.price * 1.5).toLocaleString()}</span>
+                        <span style={{ fontSize: 9, color: '#22c55e', fontWeight: 700 }}>33% OFF</span>
                       </div>
-                    </a>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                    </div>
+                  </a>
+                </div>
+              ))}
             </div>
           </main>
         </div>
       </div>
 
-      {/* MOBILE FILTER DRAWER */}
-      <AnimatePresence>
-         {isFilterOpen && (
-            <>
-               <motion.div 
-                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                 onClick={() => setIsFilterOpen(false)}
-                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-               />
-               <motion.div 
-                 initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                 className="fixed bottom-0 left-0 right-0 h-[80vh] bg-white rounded-t-[2.5rem] z-[101] overflow-hidden flex flex-col pt-8"
-               >
-                  <div className="px-8 pb-8 flex items-center justify-between border-b border-gray-50">
-                     <h2 className="text-sm font-bold uppercase tracking-[0.3em]">Refine Collection</h2>
-                     <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-gray-50 rounded-full"><X size={20} /></button>
-                  </div>
+      {/* Mobile Filter Button */}
+      <button onClick={() => setIsFilterOpen(true)} style={{
+        position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 90,
+        display: 'flex', alignItems: 'center', gap: 8, background: '#000', color: '#fff',
+        padding: '14px 32px', borderRadius: 999, border: '1px solid rgba(197,160,89,0.3)',
+        fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', cursor: 'pointer',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+      }}>
+        <SlidersHorizontal size={14} /> Filter & Sort
+      </button>
 
-                  <div className="flex-grow overflow-y-auto p-8 space-y-12">
-                     <section>
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6">Sort Selection</h3>
-                        <div className="grid grid-cols-1 gap-4">
-                           {['Newest', 'Price: Low to High', 'Price: High to Low'].map(s => (
-                              <button 
-                                key={s} onClick={() => { setSortBy(s); setIsFilterOpen(false); }}
-                                className={`px-4 py-4 border text-[10px] font-bold uppercase tracking-widest text-left transition-all ${sortBy === s ? 'border-accent bg-accent/5 text-accent' : 'border-gray-100 text-gray-500'}`}
-                              >
-                                 {s}
-                              </button>
-                           ))}
-                        </div>
-                     </section>
+      {/* Mobile Filter Drawer */}
+      {isFilterOpen && (
+        <>
+          <div onClick={() => setIsFilterOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100 }} />
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, maxHeight: '80vh', background: '#121212', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 101, overflow: 'auto', padding: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+              <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em' }}>Refine</h2>
+              <button onClick={() => setIsFilterOpen(false)} style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
+            </div>
 
-                     <section>
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6">Categories</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                           {categories.map(cat => (
-                              <button 
-                                key={cat} onClick={() => { setSelectedCategory(cat); setIsFilterOpen(false); }}
-                                className={`px-4 py-4 border text-[10px] font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'border-accent bg-accent/5 text-accent' : 'border-gray-100 text-gray-500'}`}
-                              >
-                                 {cat}
-                              </button>
-                           ))}
-                        </div>
-                     </section>
-                  </div>
+            <div style={{ marginBottom: 32 }}>
+              <h3 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em', color: '#666', marginBottom: 16 }}>Sort</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {['Newest', 'Price: Low to High', 'Price: High to Low'].map(s => (
+                  <button key={s} onClick={() => { setSortBy(s); setIsFilterOpen(false); }} style={{ padding: '14px 16px', border: sortBy === s ? '1px solid #C5A059' : '1px solid rgba(255,255,255,0.05)', background: sortBy === s ? 'rgba(197,160,89,0.1)' : 'transparent', color: sortBy === s ? '#C5A059' : '#888', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', textAlign: 'left' }}>{s}</button>
+                ))}
+              </div>
+            </div>
 
-                  <div className="p-8 border-t border-gray-50 bg-gray-50/50">
-                     <button onClick={() => setIsFilterOpen(false)} className="w-full py-5 bg-black text-white text-[10px] font-bold uppercase tracking-[0.5em] rounded-xl shadow-xl">
-                        Apply Filters
-                     </button>
-                  </div>
-               </motion.div>
-            </>
-         )}
-      </AnimatePresence>
+            <div style={{ marginBottom: 32 }}>
+              <h3 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em', color: '#666', marginBottom: 16 }}>Categories</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                {categories.map(cat => (
+                  <button key={cat} onClick={() => { setSelectedCategory(cat); setIsFilterOpen(false); }} style={{ padding: '14px 16px', border: selectedCategory === cat ? '1px solid #C5A059' : '1px solid rgba(255,255,255,0.05)', background: selectedCategory === cat ? 'rgba(197,160,89,0.1)' : 'transparent', color: selectedCategory === cat ? '#C5A059' : '#888', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer' }}>{cat}</button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={() => setIsFilterOpen(false)} style={{ width: '100%', padding: 16, background: '#C5A059', color: '#000', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em', border: 'none', borderRadius: 12, cursor: 'pointer' }}>
+              Apply Filters
+            </button>
+          </div>
+        </>
+      )}
+
+      <style>{`
+        @media (min-width: 768px) { .shop-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 20px !important; } }
+        @media (min-width: 1280px) { .shop-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+        @media (min-width: 1024px) { .lg-sidebar { display: block !important; } }
+      `}</style>
     </div>
   );
 }

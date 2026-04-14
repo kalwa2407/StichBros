@@ -33,7 +33,7 @@ export function ProductGrid({ products }: { products: any[] }) {
               className="group cursor-pointer"
             >
               <a href={`/shop/${product.id}`} className="block">
-                <div className="relative aspect-[3/4] overflow-hidden bg-white mb-6 border border-gray-200 group-hover:border-accent transition-all duration-300">
+                <div className="relative aspect-[3/4] overflow-hidden bg-surface mb-6 border border-line-soft group-hover:border-accent transition-all duration-300">
                   <img 
                     src={product.image} 
                     alt={product.name}
