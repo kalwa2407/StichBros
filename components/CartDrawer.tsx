@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ArrowRight, ShoppingBag, Tag } from 'lucide-react';
 import { useCart } from './CartContext';
 import Link from 'next/link';
 
 export function CartDrawer() {
-  const { cart, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const { cart, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+
+  const deliveryCharges = totalPrice > 50000 ? 0 : 500;
+  const savings = Math.round(totalPrice * 0.33);
 
   return (
     <AnimatePresence>
@@ -28,92 +31,152 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-bg border-l border-line z-[101] flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-[420px] bg-white z-[101] flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="p-8 border-b border-line flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-serif">Your Cart</h3>
-                <p className="text-[10px] uppercase tracking-widest text-accent mt-1">Heritage Collection</p>
+            <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <ShoppingBag size={20} className="text-gray-800" />
+                <div>
+                  <h3 className="text-base font-bold text-gray-900">Shopping Bag</h3>
+                  <p className="text-[11px] text-gray-400">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
+                </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-500"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
+            {/* Savings Banner */}
+            {cart.length > 0 && (
+              <div className="px-4 py-2.5 bg-green-50 border-b border-green-100 flex items-center gap-2">
+                <Tag size={14} className="text-green-600" />
+                <p className="text-xs text-green-700 font-medium">
+                  You save <span className="font-bold">₹{savings.toLocaleString()}</span> on this order!
+                </p>
+              </div>
+            )}
+
             {/* Items */}
-            <div className="flex-grow overflow-y-auto p-8 space-y-8">
+            <div className="flex-grow overflow-y-auto">
               {cart.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <p className="text-text-muted font-light mb-6">Your collection is currently empty.</p>
+                <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                    <ShoppingBag size={32} className="text-gray-300" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">Your bag is empty</h4>
+                  <p className="text-sm text-gray-400 mb-6">Looks like you haven't added anything yet.</p>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="button-outline"
+                    className="px-8 py-3 bg-accent text-black font-bold text-xs uppercase tracking-widest hover:bg-[#D4B26F] transition-colors"
                   >
-                    Explore Shop
+                    Continue Shopping
                   </button>
                 </div>
               ) : (
-                cart.map((item) => (
-                  <div key={item.id} className="flex gap-6 items-start">
-                    <div className="w-24 aspect-[3/4] bg-surface relative ring-1 ring-line">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="text-sm uppercase tracking-wide font-medium">{item.name}</h4>
-                        <button 
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-text-muted hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                <div className="divide-y divide-gray-100">
+                  {cart.map((item) => (
+                    <div key={item.id} className="p-4 flex gap-4 hover:bg-gray-50/50 transition-colors">
+                      {/* Product Image */}
+                      <div className="w-[90px] h-[110px] bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover" 
+                        />
                       </div>
-                      <p className="text-accent text-sm mb-4">₹{item.price.toLocaleString()}</p>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center border border-line">
-                          <button 
-                             onClick={() => updateQuantity(item.id, -1)}
-                             className="p-1 hover:bg-white/5"
-                          >
-                             <Minus size={12} />
-                          </button>
-                          <span className="w-8 text-center text-xs font-medium">{item.quantity}</span>
-                          <button 
-                             onClick={() => updateQuantity(item.id, 1)}
-                             className="p-1 hover:bg-white/5"
-                          >
-                             <Plus size={12} />
-                          </button>
+
+                      {/* Product Details */}
+                      <div className="flex-grow min-w-0 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">StichBros</p>
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
+                            </div>
+                            <button 
+                              onClick={() => removeFromCart(item.id)}
+                              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                          <p className="text-[10px] text-gray-400 mt-0.5">Hand-crafted Legacy</p>
+                        </div>
+
+                        <div className="flex items-end justify-between mt-3">
+                          {/* Quantity Controls */}
+                          <div className="flex items-center border border-gray-200 rounded-full overflow-hidden">
+                            <button 
+                              onClick={() => updateQuantity(item.id, -1)}
+                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 transition-colors"
+                            >
+                              <Minus size={12} />
+                            </button>
+                            <span className="w-8 text-center text-xs font-bold text-gray-900">{item.quantity}</span>
+                            <button 
+                              onClick={() => updateQuantity(item.id, 1)}
+                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 transition-colors"
+                            >
+                              <Plus size={12} />
+                            </button>
+                          </div>
+
+                          {/* Price */}
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">₹{item.price.toLocaleString()}</p>
+                            <p className="text-[10px] text-gray-400 line-through">₹{(item.price * 1.5).toLocaleString()}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
 
-            {/* Footer */}
+            {/* Footer / Price Summary */}
             {cart.length > 0 && (
-              <div className="p-8 border-t border-line space-y-6">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-text-muted">Subtotal</span>
-                  <span className="text-2xl font-serif text-accent">₹{totalPrice.toLocaleString()}</span>
+              <div className="border-t border-gray-200 bg-gray-50">
+                {/* Price Details */}
+                <div className="px-4 py-4 space-y-2 text-sm">
+                  <div className="flex justify-between text-gray-500">
+                    <span>Subtotal ({totalItems} items)</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Delivery</span>
+                    <span className={deliveryCharges === 0 ? 'text-green-600 font-medium' : ''}>
+                      {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-200">
+                    <span>Total</span>
+                    <span>₹{(totalPrice + deliveryCharges).toLocaleString()}</span>
+                  </div>
                 </div>
-                <Link 
-                   href="/checkout"
-                   onClick={() => setIsOpen(false)}
-                   className="button-premium w-full group flex justify-center items-center"
-                >
-                   Finalize Selection
-                   <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <p className="text-[9px] text-center text-text-muted uppercase tracking-widest">
-                  Complimentary Insured Shipping included
-                </p>
+
+                {/* CTA Buttons */}
+                <div className="px-4 pb-4 space-y-2">
+                  <Link 
+                     href="/checkout"
+                     onClick={() => setIsOpen(false)}
+                     className="flex items-center justify-center w-full py-3.5 bg-accent text-black font-bold text-xs uppercase tracking-widest hover:bg-[#D4B26F] transition-colors gap-2"
+                  >
+                     Proceed to Checkout
+                     <ArrowRight size={14} />
+                  </Link>
+                  <Link
+                     href="/bag"
+                     onClick={() => setIsOpen(false)}
+                     className="flex items-center justify-center w-full py-3 border border-gray-300 text-gray-700 font-semibold text-xs uppercase tracking-widest hover:border-gray-500 transition-colors"
+                  >
+                     View Bag
+                  </Link>
+                </div>
               </div>
             )}
           </motion.div>

@@ -27,9 +27,9 @@ export default function BagPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32 pb-24 text-black">
+    <div className="min-h-screen bg-white pt-28 md:pt-32 pb-24 text-black">
       <div className="container max-w-5xl">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
           
           {/* Bag Items */}
           <div className="flex-grow space-y-4">
@@ -55,9 +55,9 @@ export default function BagPage() {
                       <X size={20} />
                     </button>
                     
-                    <div className="flex gap-6">
-                      <div className="w-32 aspect-[3/4] bg-white overflow-hidden border border-gray-50">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="flex gap-4 md:gap-6">
+                      <div className="w-24 md:w-32 aspect-[3/4] bg-gray-50 overflow-hidden border border-gray-100 rounded-lg flex-shrink-0">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain p-1" />
                       </div>
                       
                       <div className="flex-grow space-y-1">

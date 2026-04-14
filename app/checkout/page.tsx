@@ -36,8 +36,8 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pt-32 pb-24 text-white">
-      <div className="container max-w-5xl mx-auto px-6">
+    <div className="min-h-screen bg-bg pt-28 md:pt-32 pb-24 text-white">
+      <div className="container max-w-5xl mx-auto px-4 md:px-6">
         
         {/* Progress Header */}
         <div className="flex items-center justify-center mb-12 space-x-4 md:space-x-12">
@@ -61,13 +61,13 @@ export default function CheckoutPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  className="bg-surface/50 p-8 border border-line rounded-2xl shadow-2xl backdrop-blur-sm space-y-8"
+                  className="bg-surface/50 p-5 md:p-8 border border-line rounded-2xl shadow-2xl backdrop-blur-sm space-y-6 md:space-y-8"
                 >
-                   <div className="flex items-center justify-between">
+                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <h2 className="text-sm font-bold text-accent uppercase tracking-wider flex items-center">
-                         <MapPin size={18} className="mr-2" /> Select Delivery Address
+                         <MapPin size={18} className="mr-2" /> Delivery Address
                       </h2>
-                      <button className="text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/50 px-4 py-2 hover:bg-accent hover:text-black transition-colors rounded-lg">
+                      <button className="text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/50 px-3 py-1.5 md:px-4 md:py-2 hover:bg-accent hover:text-black transition-colors rounded-lg">
                         Add New Address
                       </button>
                    </div>
@@ -228,7 +228,7 @@ export default function CheckoutPage() {
           {/* Right Sidebar - Summary */}
           {step < 3 && (
             <aside className="w-full lg:w-[420px] flex-shrink-0 space-y-6 lg:sticky lg:top-32">
-              <div className="bg-[#121212] p-8 border border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-sm">
+              <div className="bg-[#121212] p-5 md:p-8 border border-white/5 rounded-2xl md:rounded-[2rem] shadow-2xl backdrop-blur-sm">
                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-accent mb-6 pb-4 border-b border-line flex items-center">
                     <ShieldCheck size={14} className="mr-2" /> Secure Selection
                  </h3>
@@ -236,8 +236,8 @@ export default function CheckoutPage() {
                  <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                     {cart.map(item => (
                       <div key={item.id} className="flex space-x-4 items-center border-b border-line/50 pb-4 last:border-0 last:pb-0">
-                         <div className="w-20 h-24 bg-[#0a0a0a] rounded flex-shrink-0 border border-white/10 overflow-hidden flex items-center justify-center p-2 relative group">
-                            <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                         <div className="w-16 h-20 md:w-20 md:h-24 bg-[#0a0a0a] rounded-lg flex-shrink-0 border border-white/10 overflow-hidden flex items-center justify-center p-1.5">
+                            <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
                          </div>
                          <div className="flex-grow min-w-0">
                             <p className="font-bold text-[11px] leading-tight uppercase tracking-widest text-white mb-1">{item.name}</p>
