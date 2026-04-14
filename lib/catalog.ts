@@ -50,7 +50,7 @@ const collections: Collection[] = [
 ];
 
 const products: Product[] = [
-  // --- SHIRTS (6 items) ---
+  // 1
   {
     id: "leg-001",
     name: "Regency White Shirt",
@@ -69,28 +69,9 @@ const products: Product[] = [
     ],
     images: ["/brand/item_shirt_white.png", "/brand/items_shirts.png", "/brand/item_shirt_white.png", "/brand/items_shirts.png"]
   },
+  // 2
   {
     id: "leg-002",
-    name: "Consul Striped Oxford",
-    category: "Shirts",
-    collection: "sovereign",
-    price: 9800,
-    image: "/brand/item_shirt_white.png",
-    description: "A professional blue striped shirt for institutional presence.",
-    longDescription: "The Consul Oxford brings institutional weight to your daily wardrobe. Featuring a subtle blue micro-stripe, this piece is cut from heavy-duty yet breathable Oxford weave, ensuring you stay composed from the boardroom to the heritage gala.",
-    specs: ["Premium Oxford weave", "Button-down collar", "Tailored fit"],
-    sizes: commonSizes,
-    details: [
-      { label: "Fabric", value: "Premium Oxford" },
-      { label: "Collar", value: "Button-down" },
-      { label: "Origin", value: "Italian Mill" }
-    ],
-    images: ["/brand/item_shirt_white.png", "/brand/item_shirt_white.png"]
-  },
-
-  // --- FORMAL & SUITS (Hero Items) ---
-  {
-    id: "leg-022",
     name: "Sovereign Velvet Blazer",
     category: "Jackets",
     collection: "sovereign",
@@ -107,15 +88,16 @@ const products: Product[] = [
     ],
     images: ["/brand/item_velvet_blazer.png", "/brand/item_velvet_blazer.png"]
   },
+  // 3
   {
-    id: "leg-017",
+    id: "leg-003",
     name: "Sovereign Sherwani",
     category: "Formal",
     collection: "heritage",
     price: 92000,
     image: "/brand/item_sherwani.png",
     description: "Grand ivory Sherwani for monumental ceremonies.",
-    longDescription: "The ultimate expression of royal heritage. The Sovereign Sherwani is hand-crafted from raw Tussar silk, featuring intricate Zardosi embroidery that tells a story of a century-old dynasty. Each button is a custom-engraved brass crest.",
+    longDescription: "The ultimate expression of royal heritage. The Sovereign Sherwani is hand-crafted from raw Tussar silk, featuring intricate Zardosi embroidery that tells a story of a century-old dynasty.",
     specs: ["Tussar silk", "Gold threadwork", "Bespoke lining"],
     sizes: customSizes,
     details: [
@@ -125,15 +107,16 @@ const products: Product[] = [
     ],
     images: ["/brand/item_sherwani.png", "/brand/item_sherwani.png"]
   },
+  // 4
   {
-    id: "leg-020",
+    id: "leg-004",
     name: "Patriarch Overcoat",
     category: "Coats",
     collection: "estate",
     price: 82000,
     image: "/brand/item_overcoat.png",
     description: "Camel wool masterpiece with a velvet collar.",
-    longDescription: "An heirloom-grade investment. The Patriarch Overcoat is cut from incredibly heavy camel hair wool, designed to withstand the elements while projecting an aura of absolute refinement. Features a signature detachable velvet collar.",
+    longDescription: "An heirloom-grade investment. The Patriarch Overcoat is cut from incredibly heavy camel hair wool, designed to withstand the elements while projecting an aura of absolute refinement.",
     specs: ["100% Camel hair", "Satin lining", "Heirloom grade"],
     sizes: customSizes,
     details: [
@@ -141,19 +124,18 @@ const products: Product[] = [
       { label: "Collar", value: "Contrast Velvet" },
       { label: "Weight", value: "Heavyweight" }
     ],
-    images: ["/brand/item_overcoat.png", "/brand/item_overcoat.png"]
+    images: ["/brand/item_overcoat.png", "/brand/items_outerwear.png"]
   },
-
-  // --- ABAYAS (3 items) ---
+  // 5
   {
-    id: "leg-013",
+    id: "leg-005",
     name: "Onyx Gold Abaya",
     category: "Abayas",
     collection: "sovereign",
     price: 58000,
     image: "/brand/items_abayas.png",
     description: "Black silk abaya with heavy gold calligraphic embroidery.",
-    longDescription: "The Onyx Gold Abaya is a fusion of modest tradition and royal luxury. Crafted from heavyweight mulberry silk, it features hand-applied gold calligraphy on the sleeves that serves as a modern declaration of authority.",
+    longDescription: "The Onyx Gold Abaya is a fusion of modest tradition and royal luxury. Crafted from heavyweight mulberry silk, it features hand-applied gold calligraphy on the sleeves.",
     specs: ["Mulberry silk", "Zardosi embroidery", "Signature silhouette"],
     sizes: ["One Size", "Custom"],
     details: [
@@ -161,8 +143,141 @@ const products: Product[] = [
       { label: "Work", value: "Gold Calligraphy" },
       { label: "Fit", value: "Modish Flow" }
     ],
-    images: ["/brand/items_abayas.png", "/brand/items_abayas.png"]
-  }
+    images: ["/brand/items_abayas.png", "/brand/bright_abaya.png"]
+  },
+  // 6
+  {
+    id: "leg-006",
+    name: "Heritage Formal Suit",
+    category: "Formal",
+    collection: "sovereign",
+    price: 68000,
+    image: "/brand/bright_formal.png",
+    description: "A classic three-piece suit for the modern gentleman.",
+    longDescription: "The Heritage Formal Suit represents the pinnacle of StitchBros craftsmanship. A full canvas construction with hand-stitched lapels, this three-piece ensemble commands respect in every setting.",
+    specs: ["Super 150s wool", "Hand-stitched lapels", "Full canvas"],
+    sizes: customSizes,
+    details: [
+      { label: "Fabric", value: "Super 150s Merino" },
+      { label: "Fit", value: "Classic Tailored" },
+      { label: "Lining", value: "Pure Silk Bemberg" }
+    ],
+    images: ["/brand/bright_formal.png", "/brand/bright_formal.png"]
+  },
+  // 7
+  {
+    id: "leg-007",
+    name: "Emerald Ceremonial Abaya",
+    category: "Abayas",
+    collection: "heritage",
+    price: 64000,
+    image: "/brand/bright_abaya.png",
+    description: "Emerald green abaya with intricate gold detailing.",
+    longDescription: "The Emerald Ceremonial Abaya is designed for grand occasions. Featuring deep emerald silk with hand-embroidered gold floral motifs, this piece embodies regality and grace.",
+    specs: ["Pure silk", "Gold floral embroidery", "Flowing silhouette"],
+    sizes: ["One Size", "Custom"],
+    details: [
+      { label: "Fabric", value: "Pure Silk Crepe" },
+      { label: "Embroidery", value: "Gold Thread Floral" },
+      { label: "Occasion", value: "Ceremonial" }
+    ],
+    images: ["/brand/bright_abaya.png", "/brand/items_abayas.png"]
+  },
+  // 8
+  {
+    id: "leg-008",
+    name: "Casual Dynasty Jacket",
+    category: "Jackets",
+    collection: "estate",
+    price: 34000,
+    image: "/brand/bright_casual.png",
+    description: "A refined casual jacket for weekend retreats.",
+    longDescription: "The Casual Dynasty Jacket seamlessly bridges the gap between luxury and laid-back. Crafted from brushed Italian cotton twill with a garment-washed finish for lived-in softness.",
+    specs: ["Italian cotton twill", "Garment-washed", "Relaxed fit"],
+    sizes: commonSizes,
+    details: [
+      { label: "Fabric", value: "Italian Cotton Twill" },
+      { label: "Finish", value: "Garment Washed" },
+      { label: "Fit", value: "Relaxed Modern" }
+    ],
+    images: ["/brand/bright_casual.png", "/brand/bright_casual.png"]
+  },
+  // 9
+  {
+    id: "leg-009",
+    name: "Estate Wool Trenchcoat",
+    category: "Coats",
+    collection: "estate",
+    price: 78000,
+    image: "/brand/outerwear.png",
+    description: "A timeless double-breasted trenchcoat in charcoal wool.",
+    longDescription: "The Estate Wool Trenchcoat is the ultimate expression of outerwear mastery. Double-breasted with horn buttons and a storm flap, it protects against the elements while maintaining an impeccable silhouette.",
+    specs: ["Pure wool gabardine", "Horn buttons", "Storm flap"],
+    sizes: customSizes,
+    details: [
+      { label: "Fabric", value: "Wool Gabardine" },
+      { label: "Closure", value: "Double-breasted" },
+      { label: "Collar", value: "Storm Shield" }
+    ],
+    images: ["/brand/outerwear.png", "/brand/items_outerwear.png"]
+  },
+  // 10
+  {
+    id: "leg-010",
+    name: "Artisan Leather Accessories",
+    category: "Accessories",
+    collection: "sovereign",
+    price: 18500,
+    image: "/brand/accessories.png",
+    description: "Hand-stitched leather goods for the discerning collector.",
+    longDescription: "The Artisan Leather collection features hand-stitched Florentine leather goods. Each piece is individually numbered and comes with a certificate of authenticity from our master leatherworkers.",
+    specs: ["Florentine leather", "Hand-stitched", "Numbered edition"],
+    sizes: ["One Size"],
+    details: [
+      { label: "Material", value: "Florentine Calfskin" },
+      { label: "Stitching", value: "Hand Saddle-stitch" },
+      { label: "Edition", value: "Limited Numbered" }
+    ],
+    images: ["/brand/accessories.png", "/brand/accessories.png"]
+  },
+  // 11
+  {
+    id: "leg-011",
+    name: "Dynasty Heritage Collection",
+    category: "Formal",
+    collection: "heritage",
+    price: 125000,
+    image: "/brand/heritage.png",
+    description: "A curated heritage formal ensemble for the patriarch.",
+    longDescription: "The Dynasty Heritage Collection is a complete formal ensemble that includes a bespoke suit, waistcoat, and hand-tied cravat. Inspired by the founders' original patterns from 1924, this is a living piece of history.",
+    specs: ["Heritage pattern", "Complete ensemble", "Archival design"],
+    sizes: customSizes,
+    details: [
+      { label: "Origin", value: "1924 Original Pattern" },
+      { label: "Pieces", value: "3-Piece Ensemble" },
+      { label: "Edition", value: "Archive Reissue" }
+    ],
+    images: ["/brand/heritage.png", "/brand/legacy_portraits.png"]
+  },
+  // 12
+  {
+    id: "leg-012",
+    name: "Curated Collection Box",
+    category: "Collections",
+    collection: "sovereign",
+    price: 95000,
+    image: "/brand/products_collection.png",
+    description: "An exclusive seasonal collection box with hand-picked pieces.",
+    longDescription: "The Curated Collection Box delivers a seasonal assortment of our finest pieces, hand-selected by our master tailors. Each box is unique and tailored to the recipient's personal style profile.",
+    specs: ["Seasonal curation", "Hand-selected", "Personal styling"],
+    sizes: ["S-M", "L-XL"],
+    details: [
+      { label: "Contents", value: "4-6 Pieces" },
+      { label: "Curation", value: "Master Tailor" },
+      { label: "Packaging", value: "Heritage Wood Box" }
+    ],
+    images: ["/brand/products_collection.png", "/brand/items_mixed.png"]
+  },
 ];
 
 const legacyTimeline: Legacy[] = [

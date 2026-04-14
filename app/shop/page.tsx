@@ -119,7 +119,7 @@ export default function ShopPage() {
             </div>
 
             {/* Myntra-Style Grid - 2 Col on Mobile, 4 Col on Desktop */}
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-x-8 md:gap-y-12 pb-24">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5 pb-24">
               <AnimatePresence mode="popLayout">
                 {filteredProducts.map((product) => (
                   <motion.div

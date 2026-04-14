@@ -11,7 +11,7 @@ export default function Home() {
   const data = getHomepageData();
   
   // Only show first 6 items on home
-  const featuredProducts = data.products.slice(0, 6);
+  const featuredProducts = data.products.slice(0, 8);
 
   return (
     <main className="min-h-screen bg-bg selection:bg-accent selection:text-black">

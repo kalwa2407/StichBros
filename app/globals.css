@@ -284,6 +284,10 @@ button {
   .lg\:text-\[10rem\] { font-size: 10rem; }
 }
 
+@media (min-width: 1280px) {
+  .xl\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
 /* Original Premium Components Base */
 .container {
   width: min(1400px, calc(100% - 80px));
