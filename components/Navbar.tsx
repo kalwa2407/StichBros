@@ -13,6 +13,7 @@ export function Navbar() {
   const { totalItems } = useCart();
 
   const isHomePage = pathname === '/';
+  const isAdmin = pathname.startsWith('/admin');
 
   useEffect(() => {
     setIsMounted(true);
@@ -24,6 +25,7 @@ export function Navbar() {
   }, []);
 
   if (!isMounted) return null;
+  if (isAdmin) return null;
 
   // Solid navbar for retail pages, cinematic/transparent for home
   const navbarBg = isHomePage 

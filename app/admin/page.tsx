@@ -11,7 +11,6 @@ import {
   Package,
   Clock
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {
   
@@ -29,104 +28,107 @@ export default function AdminDashboard() {
     { id: 'ORD-7718', customer: 'Ishani Roy', product: 'Onyx Gold Abaya', status: 'Verification', amount: '₹58,000', date: '5 hours ago' },
   ];
 
+  const cardStyle: React.CSSProperties = {
+    background: '#121212', border: '1px solid rgba(255,255,255,0.05)', padding: 32,
+    borderRadius: 24, transition: 'all 0.2s',
+  };
+
+  const statusColor = (status: string) => {
+    if (status === 'Delivered') return { bg: 'rgba(34,197,94,0.1)', color: '#22c55e' };
+    if (status === 'Shipped') return { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6' };
+    return { bg: 'rgba(197,160,89,0.1)', color: '#C5A059' };
+  };
+
   return (
-    <div className="space-y-12">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         {stats.map((stat, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="bg-[#121212] border border-white/5 p-8 rounded-[2rem] hover:border-accent/20 transition-all group"
-            >
-               <div className="flex items-center justify-between mb-6">
-                  <div className="p-3 bg-accent/10 rounded-xl text-accent group-hover:bg-accent group-hover:text-black transition-colors">
-                     <stat.icon size={20} />
-                  </div>
-                  <div className={`flex items-center space-x-1 text-[10px] font-bold ${stat.isUp ? 'text-green-500' : 'text-red-500'} uppercase tracking-tighter`}>
-                     <span>{stat.change}</span>
-                     {stat.isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                  </div>
-               </div>
-               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-               <h3 className="text-3xl font-bold tracking-tight">{stat.value}</h3>
-            </motion.div>
-         ))}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+        {stats.map((stat, idx) => (
+          <div key={idx} style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+              <div style={{ padding: 12, background: 'rgba(197,160,89,0.1)', borderRadius: 12, color: '#C5A059' }}>
+                <stat.icon size={20} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 700, color: stat.isUp ? '#22c55e' : '#ef4444' }}>
+                <span>{stat.change}</span>
+                {stat.isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              </div>
+            </div>
+            <p style={{ fontSize: 10, color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 4 }}>{stat.label}</p>
+            <h3 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.025em' }}>{stat.value}</h3>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-         {/* Recent Orders Table */}
-         <div className="lg:col-span-2 bg-[#121212] border border-white/5 rounded-[2.5rem] p-8">
-            <div className="flex items-center justify-between mb-8">
-               <h3 className="text-sm font-bold uppercase tracking-[0.3em]">Live Feed: Orders</h3>
-               <button className="text-[10px] font-bold uppercase tracking-widest text-accent hover:underline">View All Orders</button>
-            </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+        {/* Recent Orders */}
+        <div style={{ ...cardStyle, borderRadius: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3em' }}>Live Feed: Orders</h3>
+            <a href="/admin/orders" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#C5A059', textDecoration: 'none' }}>View All</a>
+          </div>
 
-            <div className="space-y-4">
-               {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 rounded-2xl hover:bg-white/[0.02] transition-colors border border-transparent hover:border-white/5 group">
-                     <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-accent">
-                           <ShoppingBag size={18} />
-                        </div>
-                        <div>
-                           <p className="text-xs font-bold text-white uppercase tracking-widest">{order.id}</p>
-                           <p className="text-[10px] text-gray-500">{order.customer} • {order.product}</p>
-                        </div>
-                     </div>
-                     <div className="text-right flex items-center space-x-8">
-                        <div>
-                           <p className="text-xs font-bold text-white">{order.amount}</p>
-                           <p className="text-[9px] text-gray-500 uppercase flex items-center justify-end"><Clock size={10} className="mr-1" /> {order.date}</p>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest ${
-                           order.status === 'Delivered' ? 'bg-green-500/10 text-green-500' : 
-                           order.status === 'Shipped' ? 'bg-blue-500/10 text-blue-500' : 
-                           'bg-accent/10 text-accent'
-                        }`}>
-                           {order.status}
-                        </span>
-                     </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {recentOrders.map((order) => {
+              const sc = statusColor(order.status);
+              return (
+                <div key={order.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.03)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A059' }}>
+                      <ShoppingBag size={18} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{order.id}</p>
+                      <p style={{ fontSize: 10, color: '#666' }}>{order.customer} • {order.product}</p>
+                    </div>
                   </div>
-               ))}
-            </div>
-         </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: 12, fontWeight: 700 }}>{order.amount}</p>
+                      <p style={{ fontSize: 9, color: '#666', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}><Clock size={10} /> {order.date}</p>
+                    </div>
+                    <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: sc.bg, color: sc.color }}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-         {/* Inventory Summary */}
-         <div className="bg-accent rounded-[2.5rem] p-8 text-black flex flex-col justify-between overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-               <Package size={120} />
+        {/* Low Stock Alert */}
+        <div style={{ background: '#C5A059', borderRadius: 28, padding: 32, color: '#000', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, padding: 32, opacity: 0.1 }}>
+            <Package size={120} />
+          </div>
+          
+          <div style={{ position: 'relative', zIndex: 10 }}>
+            <h3 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: 32 }}>Low Stock Alert</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: 16 }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700 }}>Regency White Shirt</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', opacity: 0.6 }}>Sovereign Collection</p>
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 700 }}>2 Left</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: 16 }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700 }}>Sovereign Sherwani</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', opacity: 0.6 }}>Heritage Line</p>
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 700 }}>1 Left</span>
+              </div>
             </div>
-            
-            <div className="relative z-10">
-               <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-8">Low Stock Alert</h3>
-               <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-black/10 pb-4">
-                     <div>
-                        <p className="text-sm font-bold">Consul Striped Oxford</p>
-                        <p className="text-[10px] font-bold uppercase opacity-60">Sovereign Collection</p>
-                     </div>
-                     <span className="text-xs font-bold">2 Left</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-black/10 pb-4">
-                     <div>
-                        <p className="text-sm font-bold">Sovereign Sherwani</p>
-                        <p className="text-[10px] font-bold uppercase opacity-60">Heritage Line</p>
-                     </div>
-                     <span className="text-xs font-bold">1 Left</span>
-                  </div>
-               </div>
-            </div>
+          </div>
 
-            <button className="relative z-10 w-full py-4 bg-black text-white rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] mt-8 hover:bg-gray-900 transition-colors">
-               Manage Inventory
-            </button>
-         </div>
+          <a href="/admin/inventory" style={{ position: 'relative', zIndex: 10, display: 'block', width: '100%', padding: 16, background: '#000', color: '#fff', borderRadius: 16, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4em', marginTop: 32, textAlign: 'center', textDecoration: 'none' }}>
+            Manage Inventory
+          </a>
+        </div>
       </div>
-
     </div>
   );
 }

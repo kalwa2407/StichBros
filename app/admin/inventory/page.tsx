@@ -3,19 +3,8 @@
 import React, { useState } from 'react';
 import { getHomepageData } from '@/lib/catalog';
 import { 
-  Package, 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  Plus, 
-  ArrowUpDown,
-  Eye,
-  Edit3,
-  Trash2,
-  CheckCircle2,
-  XCircle
+  Package, Search, Plus, Eye, Edit3, Trash2, CheckCircle2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function InventoryPage() {
   const data = getHomepageData();
@@ -30,153 +19,145 @@ export default function InventoryPage() {
      p.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const thStyle: React.CSSProperties = {
+    padding: '20px 24px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+    letterSpacing: '0.15em', color: '#666', borderBottom: '1px solid rgba(255,255,255,0.05)',
+  };
+
+  const tdStyle: React.CSSProperties = {
+    padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.03)',
+  };
+
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       
-      {/* Header Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-         <div>
-            <h1 className="text-2xl font-bold tracking-tight mb-1">Inventory Manager</h1>
-            <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Total SKUs: {products.length}</p>
-         </div>
-         <div className="flex items-center space-x-4">
-            <div className="relative group">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-accent transition-colors" size={16} />
-               <input 
-                 type="text" 
-                 placeholder="Search products..."
-                 value={searchTerm}
-                 onChange={(e) => setSearchTerm(e.target.value)}
-                 className="bg-[#121212] border border-white/5 pl-12 pr-6 py-3 rounded-xl text-xs focus:ring-1 ring-accent/50 outline-none w-full md:w-80 transition-all font-medium"
-               />
-            </div>
-            <button className="p-3 bg-[#121212] border border-white/5 rounded-xl hover:border-accent/40 transition-colors text-gray-400">
-               <Filter size={20} />
-            </button>
-            <button className="bg-accent text-black px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 shadow-xl shadow-accent/10 hover:scale-[1.02] transition-transform">
-               <Plus size={16} />
-               <span>Add Product</span>
-            </button>
-         </div>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Inventory Manager</h1>
+          <p style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>Total SKUs: {products.length}</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ position: 'relative' }}>
+            <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#666' }} size={16} />
+            <input 
+              type="text" placeholder="Search products..."
+              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', padding: '12px 16px 12px 44px', borderRadius: 12, fontSize: 12, color: '#fff', outline: 'none', width: 280 }}
+            />
+          </div>
+          <a href="/admin/add-product" style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#C5A059', color: '#000', padding: '12px 20px', borderRadius: 12, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none' }}>
+            <Plus size={16} />
+            <span>Add Product</span>
+          </a>
+        </div>
       </div>
 
       {/* Category Filters */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
-         {categories.map((cat: any) => (
-            <button 
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all ${categoryFilter === cat ? 'bg-accent text-black shadow-[0_0_15px_rgba(212,178,111,0.3)]' : 'bg-[#121212] border border-white/5 text-gray-400 hover:text-white hover:border-white/20'}`}
-            >
-               {cat}
-            </button>
-         ))}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
+        {categories.map((cat: any) => (
+          <button 
+            key={cat}
+            onClick={() => setCategoryFilter(cat)}
+            style={{
+              padding: '10px 24px', borderRadius: 999, fontSize: 10, fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap',
+              cursor: 'pointer', transition: 'all 0.2s', border: 'none',
+              background: categoryFilter === cat ? '#C5A059' : '#121212',
+              color: categoryFilter === cat ? '#000' : '#888',
+            }}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
-      {/* Inventory Table Card */}
-      <div className="bg-[#121212] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-         <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-               <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.01]">
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                        <div className="flex items-center space-x-2">
-                           <span>Product</span>
-                           <ArrowUpDown size={12} className="opacity-0 group-hover:opacity-100" />
-                        </div>
-                     </th>
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Category</th>
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Price</th>
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Stock</th>
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500 text-center">Status</th>
-                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500"></th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-white/5 text-sm">
-                  <AnimatePresence>
-                     {products.map((product, idx) => (
-                        <motion.tr 
-                          key={product.id}
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="group hover:bg-white/[0.03] transition-all cursor-pointer relative"
-                        >
-                           <td className="p-6">
-                              <div className="flex items-center space-x-4">
-                                 <div className="w-12 h-16 bg-white/5 rounded overflow-hidden flex-shrink-0 grayscale group-hover:grayscale-0 transition-all">
-                                    <img src={product.image} className="w-full h-full object-cover" alt="" />
-                                 </div>
-                                 <div>
-                                    <p className="font-bold text-white tracking-wide">{product.name}</p>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-tighter">ID: {product.id}</p>
-                                 </div>
-                              </div>
-                           </td>
-                           <td className="p-6">
-                              <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                                 {product.category}
-                              </span>
-                           </td>
-                           <td className="p-6">
-                              <p className="font-serif italic font-bold text-accent">₹{product.price.toLocaleString()}</p>
-                           </td>
-                           <td className="p-6">
-                              <div className="flex items-center space-x-2">
-                                 <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                    <div className={`h-full ${product.price > 50000 ? 'bg-orange-500 w-1/4' : 'bg-accent w-3/4'} rounded-full`} />
-                                 </div>
-                                 <span className="text-[10px] font-bold text-gray-400">
-                                    {product.price > 50000 ? '2' : '15'} Left
-                                 </span>
-                              </div>
-                           </td>
-                           <td className="p-6 text-center">
-                              <span className="inline-flex items-center space-x-1.5 text-xs font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded-full uppercase tracking-tighter">
-                                 <CheckCircle2 size={12} />
-                                 <span>Active</span>
-                              </span>
-                           </td>
-                           <td className="p-6 text-right">
-                              <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                 <button title="View Line Sheet" className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all">
-                                    <Eye size={16} />
-                                 </button>
-                                 <button title="Edit Product" className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all">
-                                    <Edit3 size={16} />
-                                 </button>
-                                 <button title="Archive" className="p-2 hover:bg-white/10 rounded-lg text-red-500/60 hover:text-red-500 transition-all">
-                                    <Trash2 size={16} />
-                                 </button>
-                              </div>
-                           </td>
-                        </motion.tr>
-                     ))}
-                  </AnimatePresence>
-               </tbody>
-            </table>
-            
-            {products.length === 0 && (
-               <div className="py-24 text-center">
-                  <Package className="mx-auto text-gray-700 mb-4" size={48} />
-                  <p className="text-gray-500 text-sm font-light">No products match your search.</p>
-               </div>
-            )}
-         </div>
+      {/* Table */}
+      <div style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, overflow: 'hidden' }}>
+        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={thStyle}>Product</th>
+              <th style={thStyle}>Category</th>
+              <th style={thStyle}>Price</th>
+              <th style={thStyle}>Stock</th>
+              <th style={{ ...thStyle, textAlign: 'center' }}>Status</th>
+              <th style={thStyle}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id} style={{ transition: 'background 0.2s' }} onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                <td style={tdStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ width: 48, height: 64, background: 'rgba(255,255,255,0.05)', borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+                      <img src={product.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.025em' }}>{product.name}</p>
+                      <p style={{ fontSize: 10, color: '#666' }}>ID: {product.id}</p>
+                    </div>
+                  </div>
+                </td>
+                <td style={tdStyle}>
+                  <span style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888' }}>
+                    {product.category}
+                  </span>
+                </td>
+                <td style={tdStyle}>
+                  <p style={{ fontWeight: 700, color: '#C5A059', fontStyle: 'italic' }}>₹{product.price.toLocaleString()}</p>
+                </td>
+                <td style={tdStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 64, height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 999, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: product.price > 50000 ? '25%' : '75%', background: product.price > 50000 ? '#f97316' : '#C5A059', borderRadius: 999 }} />
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#888' }}>
+                      {product.price > 50000 ? '2' : '15'} Left
+                    </span>
+                  </div>
+                </td>
+                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '4px 12px', borderRadius: 999 }}>
+                    <CheckCircle2 size={12} />
+                    Active
+                  </span>
+                </td>
+                <td style={{ ...tdStyle, textAlign: 'right' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                    <button title="View" style={{ padding: 8, borderRadius: 8, background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
+                      <Eye size={16} />
+                    </button>
+                    <button title="Edit" style={{ padding: 8, borderRadius: 8, background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
+                      <Edit3 size={16} />
+                    </button>
+                    <button title="Delete" style={{ padding: 8, borderRadius: 8, background: 'none', border: 'none', color: 'rgba(239,68,68,0.6)', cursor: 'pointer' }}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {products.length === 0 && (
+          <div style={{ padding: 96, textAlign: 'center' }}>
+            <Package style={{ margin: '0 auto 16px', color: '#444' }} size={48} />
+            <p style={{ color: '#666', fontSize: 14 }}>No products match your search.</p>
+          </div>
+        )}
 
-         {/* Pagination Footer */}
-         <div className="p-6 bg-white/[0.01] border-t border-white/5 flex items-center justify-between">
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Showing {products.length} of {data.products.length} Products</p>
-            <div className="flex items-center space-x-4">
-               <button disabled className="text-[10px] font-bold uppercase tracking-widest text-gray-600 cursor-not-allowed">Previous</button>
-               <div className="flex space-x-1">
-                  <span className="w-8 h-8 rounded-lg bg-accent text-black flex items-center justify-center text-xs font-bold">1</span>
-               </div>
-               <button className="text-[10px] font-bold uppercase tracking-widest text-accent hover:underline">Next</button>
-            </div>
-         </div>
+        {/* Footer */}
+        <div style={{ padding: 24, background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p style={{ fontSize: 10, color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+            Showing {products.length} of {data.products.length} Products
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ width: 32, height: 32, borderRadius: 8, background: '#C5A059', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>1</span>
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }
