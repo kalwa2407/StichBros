@@ -227,20 +227,20 @@ export default function CheckoutPage() {
 
           {/* Right Sidebar - Summary */}
           {step < 3 && (
-            <aside className="w-full lg:w-96 flex-shrink-0 space-y-6 lg:sticky lg:top-32">
-              <div className="bg-surface/50 p-6 border border-line rounded-2xl shadow-2xl backdrop-blur-sm">
+            <aside className="w-full lg:w-[420px] flex-shrink-0 space-y-6 lg:sticky lg:top-32">
+              <div className="bg-[#121212] p-8 border border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-sm">
                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-accent mb-6 pb-4 border-b border-line flex items-center">
                     <ShieldCheck size={14} className="mr-2" /> Secure Selection
                  </h3>
                  
-                 <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                 <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                     {cart.map(item => (
-                      <div key={item.id} className="flex space-x-4 items-center">
-                         <div className="w-16 h-20 bg-black rounded-lg shrink-0 border border-line overflow-hidden relative group">
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <div key={item.id} className="flex space-x-4 items-center border-b border-line/50 pb-4 last:border-0 last:pb-0">
+                         <div className="w-20 h-24 bg-[#0a0a0a] rounded flex-shrink-0 border border-white/10 overflow-hidden flex items-center justify-center p-2 relative group">
+                            <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" />
                          </div>
-                         <div className="flex-grow">
-                            <p className="font-bold text-xs uppercase tracking-wider text-white line-clamp-1 mb-1">{item.name}</p>
+                         <div className="flex-grow min-w-0">
+                            <p className="font-bold text-[11px] leading-tight uppercase tracking-widest text-white mb-1">{item.name}</p>
                             <p className="text-[10px] text-text-muted uppercase tracking-widest mb-2">Qty: {item.quantity}</p>
                             <p className="font-serif italic text-accent text-sm">₹{item.price.toLocaleString()}</p>
                          </div>

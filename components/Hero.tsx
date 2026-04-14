@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
 export function Hero() {
   const [isMounted, setIsMounted] = useState(false);
+  const { scrollY } = useScroll();
+  const yBackground = useTransform(scrollY, [0, 1000], [0, 300]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -22,12 +24,13 @@ export function Hero() {
 
   return (
     <section className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden pt-20">
-      {/* Background with Parallax effect simulation */}
-      <div className="absolute inset-0 z-0">
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+      {/* Background with Parallax effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <motion.div 
+          className="absolute inset-[-10%] bg-cover bg-center"
           style={{ 
             backgroundImage: "url('/brand/hero_bg.png')",
+            y: yBackground,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-bg" />
@@ -48,13 +51,13 @@ export function Hero() {
             Preserving <br />
             <span className="italic text-accent">Wealth.</span>
           </h1>
-          <div className="flex flex-col items-center">
-             <div className="divider-gold mb-8"></div>
-             <p className="text-gray-300 max-w-2xl text-lg font-light leading-relaxed mb-10">
-               StichBros delivers bespoke tailoring environments and comprehensive 
-               wardrobe direction for discerning individuals and generations.
-             </p>
-             <div className="flex flex-col sm:flex-row gap-6">
+           <div className="flex flex-col items-center">
+              <div className="w-16 h-[1px] bg-accent/50 mb-8"></div>
+              <p className="text-gray-400 max-w-lg text-sm font-medium leading-loose tracking-wide mb-10 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-2xl">
+                StichBros delivers bespoke tailoring environments and comprehensive 
+                wardrobe direction for discerning individuals and generations.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-6">
                 <a href="/shop" className="button-premium px-12 py-4 bg-accent text-black font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform">
                    Explore Collection
                 </a>
