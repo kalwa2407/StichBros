@@ -45,7 +45,7 @@ export default function AddProductPage() {
 
   const originalPrice = price ? Math.round(Number(price) / (1 - Number(discountPercent) / 100)) : 0;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name || !price) return;
     
     const product = {
@@ -66,7 +66,12 @@ export default function AddProductPage() {
       images: [imagePreview || '/brand/items_mixed.png'],
     };
 
-    // Actually add to catalog
+    // Save to server (Redis) for cross-device persistence
+    try {
+      await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(product) });
+    } catch (e) { console.error(e); }
+
+    // Also save locally for same-session display
     addDynamicProduct(product);
     
     setSavedProducts(prev => [...prev, product]);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Filter, ChevronDown, ShoppingBag, Heart, X, SlidersHorizontal } from 'lucide-react';
 import { getHomepageData } from '@/lib/catalog';
 import { useCart } from '@/components/CartContext';
@@ -8,25 +8,36 @@ import { useCart } from '@/components/CartContext';
 export default function ShopPage() {
   const data = getHomepageData();
   const { addToCart } = useCart();
+  const [customProducts, setCustomProducts] = useState<any[]>([]);
   
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showSort, setShowSort] = useState(false);
 
+  // Fetch custom products from server (Redis)
+  useEffect(() => {
+    fetch('/api/products').then(r => r.json()).then(data => {
+      const parsed = data.map((p: any) => typeof p === 'string' ? JSON.parse(p) : p);
+      setCustomProducts(parsed);
+    }).catch(() => {});
+  }, []);
+
+  const allProducts = useMemo(() => [...data.products, ...customProducts], [data.products, customProducts]);
+
   const categories = useMemo(() => {
-    return ['All', ...new Set(data.products.map(p => p.category))];
-  }, [data.products]);
+    return ['All', ...new Set(allProducts.map(p => p.category))];
+  }, [allProducts]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...data.products];
+    let result = [...allProducts];
     if (selectedCategory !== 'All') {
       result = result.filter(p => p.category === selectedCategory);
     }
     if (sortBy === 'Price: Low to High') result.sort((a, b) => a.price - b.price);
     else if (sortBy === 'Price: High to Low') result.sort((a, b) => b.price - a.price);
     return result;
-  }, [selectedCategory, sortBy, data.products]);
+  }, [selectedCategory, sortBy, allProducts]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingTop: 100, paddingBottom: 100, color: '#fff', fontFamily: 'Inter, sans-serif' }}>

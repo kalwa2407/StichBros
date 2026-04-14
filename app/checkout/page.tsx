@@ -34,7 +34,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true);
     const newOrderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
     setOrderId(newOrderId);
@@ -54,11 +54,9 @@ export default function CheckoutPage() {
       method: paymentMethod === 'card' ? 'Credit Card (Visa)' : 'UPI',
     };
 
-    // CRITICAL: Re-read localStorage at save time to avoid overwriting orders from other tabs
+    // Save to server (Redis) — works across all devices
     try {
-      const freshOrders = JSON.parse(localStorage.getItem('stichbros_orders') || '[]');
-      freshOrders.unshift(order);
-      localStorage.setItem('stichbros_orders', JSON.stringify(freshOrders));
+      await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) });
     } catch (e) { console.error(e); }
 
     setTimeout(() => {
