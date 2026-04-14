@@ -27,7 +27,7 @@ export function Hero() {
       {/* Background with Parallax effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div 
-          className="absolute inset-[-10%] bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center scale-110"
           style={{ 
             backgroundImage: "url('/brand/hero_bg.png')",
             y: yBackground,
@@ -52,11 +52,14 @@ export function Hero() {
             <span className="italic text-accent">Wealth.</span>
           </h1>
            <div className="flex flex-col items-center">
-              <div className="w-16 h-[1px] bg-accent/50 mb-8"></div>
-              <p className="text-gray-400 max-w-lg text-sm font-medium leading-loose tracking-wide mb-10 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-2xl">
+              <p className="font-serif italic text-xl md:text-2xl text-accent mb-4 tracking-wide opacity-90">
+                 A Legacy of Elegance
+              </p>
+              <p className="text-white/80 max-w-2xl text-sm md:text-base font-light leading-loose tracking-[0.15em] text-center uppercase">
                 StichBros delivers bespoke tailoring environments and comprehensive 
                 wardrobe direction for discerning individuals and generations.
               </p>
+              <div className="w-px h-16 bg-gradient-to-b from-accent to-transparent my-10"></div>
               <div className="flex flex-col sm:flex-row gap-6">
                 <a href="/shop" className="button-premium px-12 py-4 bg-accent text-black font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform">
                    Explore Collection
