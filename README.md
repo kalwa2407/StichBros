@@ -1,4 +1,4 @@
-# ChoiceMensWear
+# StichBros
 
 A premium full-stack menswear storefront concept built with Next.js.
 

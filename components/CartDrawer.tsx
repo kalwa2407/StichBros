@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from './CartContext';
+import Link from 'next/link';
 
 export function CartDrawer() {
   const { cart, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice } = useCart();
@@ -102,13 +103,14 @@ export function CartDrawer() {
                   <span className="text-[10px] uppercase tracking-[0.3em] text-text-muted">Subtotal</span>
                   <span className="text-2xl font-serif text-accent">₹{totalPrice.toLocaleString()}</span>
                 </div>
-                <button 
-                   onClick={() => alert("Checkout flow initiated. In a real store, you'd go to payment now.")}
-                   className="button-premium w-full group"
+                <Link 
+                   href="/checkout"
+                   onClick={() => setIsOpen(false)}
+                   className="button-premium w-full group flex justify-center items-center"
                 >
                    Finalize Selection
                    <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
                 <p className="text-[9px] text-center text-text-muted uppercase tracking-widest">
                   Complimentary Insured Shipping included
                 </p>

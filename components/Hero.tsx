@@ -51,7 +51,7 @@ export function Hero() {
           <div className="flex flex-col items-center">
              <div className="divider-gold mb-8"></div>
              <p className="text-gray-300 max-w-2xl text-lg font-light leading-relaxed mb-10">
-               Choice delivers bespoke tailoring environments and comprehensive 
+               StichBros delivers bespoke tailoring environments and comprehensive 
                wardrobe direction for discerning individuals and generations.
              </p>
              <div className="flex flex-col sm:flex-row gap-6">

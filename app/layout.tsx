@@ -5,9 +5,9 @@ import { Navbar } from "@/components/Navbar";
 import { CartDrawer } from "@/components/CartDrawer";
 
 export const metadata: Metadata = {
-  title: "ChoiceMensWear | Premium Luxury Menswear",
+  title: "StichBros | Premium Luxury Menswear",
   description:
-    "ChoiceMensWear is a premium menswear storefront concept with editorial design, luxury collections, and a concierge-led shopping experience.",
+    "StichBros is a premium menswear storefront concept with editorial design, luxury collections, and a concierge-led shopping experience.",
 };
 
 export default function RootLayout({

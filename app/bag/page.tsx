@@ -41,7 +41,7 @@ export default function BagPage() {
 
              <div className="p-4 border border-gray-100 rounded flex items-center space-x-3 text-sm">
                 <Truck size={18} className="text-gray-400" />
-                <span className="font-bold text-xs uppercase tracking-tight">Choice Complimentary Shipping</span>
+                <span className="font-bold text-xs uppercase tracking-tight">StichBros Complimentary Shipping</span>
                 <span className="text-gray-400 text-xs">For Silver Tier Legacy Members</span>
              </div>
 
@@ -61,7 +61,7 @@ export default function BagPage() {
                       </div>
                       
                       <div className="flex-grow space-y-1">
-                        <h4 className="text-sm font-bold truncate">CHOICE</h4>
+                        <h4 className="text-sm font-bold truncate">STICHBROS</h4>
                         <h3 className="text-sm text-gray-600 mb-2 truncate">{item.name}</h3>
                         <p className="text-[10px] uppercase tracking-widest text-gray-400 bg-gray-50 inline-block px-2 py-1 mb-4">
                            Hand-crafted Legacy

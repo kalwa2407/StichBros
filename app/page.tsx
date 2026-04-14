@@ -45,7 +45,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-24 border-t border-line text-center">
         <div className="container">
-          <h2 className="text-3xl font-serif tracking-[0.2em] text-accent mb-8">CHOICE</h2>
+          <h2 className="text-3xl font-serif tracking-[0.2em] text-accent mb-8">STICHBROS</h2>
           <div className="flex justify-center space-x-12 text-[10px] uppercase tracking-[0.3em] text-text-muted mb-12">
              <a href="#" className="hover:text-accent">Instagram</a>
              <a href="#" className="hover:text-accent">Concierge</a>
@@ -53,7 +53,7 @@ export default function Home() {
              <a href="#" className="hover:text-accent">Privacy</a>
           </div>
           <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted/40 font-mono">
-             © 2024 CHOICE MENSWEAR. PRESERVING ART. BUILDING LEGACIES.
+             © 2024 STICHBROS. PRESERVING ART. BUILDING LEGACIES.
           </p>
         </div>
       </footer>

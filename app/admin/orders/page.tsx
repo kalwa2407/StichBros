@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ShoppingBag, 
   Search, 
@@ -17,8 +17,10 @@ import {
 import { motion } from 'framer-motion';
 
 export default function OrdersPage() {
+  const [filter, setFilter] = useState('All');
+  const [search, setSearch] = useState('');
   
-  const orders = [
+  const initialOrders = [
     { 
       id: 'ORD-7721', 
       customer: 'Araya Varma', 
@@ -65,6 +67,12 @@ export default function OrdersPage() {
     }
   ];
 
+  const filteredOrders = initialOrders.filter(order => 
+    (filter === 'All' || order.status === filter) &&
+    (order.id.toLowerCase().includes(search.toLowerCase()) || 
+     order.customer.toLowerCase().includes(search.toLowerCase()))
+  );
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Delivered': return 'text-green-500 bg-green-500/10 border-green-500/20';
@@ -89,24 +97,46 @@ export default function OrdersPage() {
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                <input 
                  type="text" 
+                 value={search}
+                 onChange={(e) => setSearch(e.target.value)}
                  placeholder="Search Order ID, Customer..."
-                 className="bg-[#121212] border border-white/5 pl-12 pr-6 py-3 rounded-xl text-xs outline-none w-full md:w-80 transition-all"
+                 className="bg-[#121212] border border-white/5 pl-12 pr-6 py-3 rounded-xl text-xs outline-none w-full md:w-80 transition-all focus:border-accent/50 focus:ring-1 focus:ring-accent/20"
                />
             </div>
          </div>
       </div>
 
+      {/* Quick Filters */}
+      <div className="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+         {['All', 'Processing', 'Verification', 'Shipped', 'Delivered'].map(status => (
+            <button 
+              key={status}
+              onClick={() => setFilter(status)}
+              className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all ${filter === status ? 'bg-accent text-black shadow-[0_0_15px_rgba(212,178,111,0.3)]' : 'bg-[#121212] border border-white/5 text-gray-400 hover:text-white hover:border-white/20'}`}
+            >
+               {status}
+            </button>
+         ))}
+      </div>
+
       {/* Orders List */}
       <div className="space-y-4">
-         {orders.map((order, idx) => (
+         {filteredOrders.length === 0 ? (
+            <div className="py-20 text-center bg-[#121212] border border-white/5 rounded-3xl">
+               <ShoppingBag className="mx-auto text-gray-700 mb-4" size={48} />
+               <p className="text-gray-500 text-sm font-light">No orders found for this filter.</p>
+            </div>
+         ) : (
+            filteredOrders.map((order, idx) => (
             <motion.div 
               key={order.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="bg-[#121212] border border-white/5 rounded-3xl p-6 hover:border-accent/30 transition-all group"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="bg-[#121212] border border-white/5 rounded-3xl p-6 hover:border-accent/40 transition-all group hover:shadow-[0_0_30px_rgba(212,178,111,0.05)] relative overflow-hidden"
             >
-               <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+               <div className="flex flex-col lg:flex-row lg:items-center gap-8 relative z-10">
                   
                   {/* ID & Date */}
                   <div className="lg:w-1/6">
@@ -160,7 +190,7 @@ export default function OrdersPage() {
                   </div>
                </div>
             </motion.div>
-         ))}
+         )))}
       </div>
 
       {/* Analytics Insight Card */}

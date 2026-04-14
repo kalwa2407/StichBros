@@ -20,10 +20,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function InventoryPage() {
   const data = getHomepageData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
   
-  const products = data.products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const categories = ['All', ...Array.from(new Set(data.products.map((p: any) => p.category)))];
+
+  const products = data.products.filter((p: any) => 
+    (categoryFilter === 'All' || p.category === categoryFilter) &&
+    (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+     p.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -56,8 +60,21 @@ export default function InventoryPage() {
          </div>
       </div>
 
+      {/* Category Filters */}
+      <div className="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+         {categories.map((cat: any) => (
+            <button 
+              key={cat}
+              onClick={() => setCategoryFilter(cat)}
+              className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all ${categoryFilter === cat ? 'bg-accent text-black shadow-[0_0_15px_rgba(212,178,111,0.3)]' : 'bg-[#121212] border border-white/5 text-gray-400 hover:text-white hover:border-white/20'}`}
+            >
+               {cat}
+            </button>
+         ))}
+      </div>
+
       {/* Inventory Table Card */}
-      <div className="bg-[#121212] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+      <div className="bg-[#121212] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)]">
          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
                <thead>
@@ -80,10 +97,11 @@ export default function InventoryPage() {
                      {products.map((product, idx) => (
                         <motion.tr 
                           key={product.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
+                          key={product.id}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
-                          className="group hover:bg-white/[0.012] transition-colors"
+                          className="group hover:bg-white/[0.03] transition-all cursor-pointer relative"
                         >
                            <td className="p-6">
                               <div className="flex items-center space-x-4">

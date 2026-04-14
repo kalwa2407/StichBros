@@ -169,7 +169,7 @@ const legacyTimeline: Legacy[] = [
   {
     year: "1924",
     title: "The First Stitch",
-    description: "Founded in the heart of the city, Choice began as a private atelier for the elite.",
+    description: "Founded in the heart of the city, StichBros began as a private atelier for the elite.",
     image: "/brand/legacy_portraits.png"
   },
   {

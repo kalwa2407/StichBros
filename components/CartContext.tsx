@@ -30,7 +30,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Sync with local storage
   useEffect(() => {
-    const savedCart = localStorage.getItem('choice_cart');
+    const savedCart = localStorage.getItem('stichbros_cart');
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('choice_cart', JSON.stringify(cart));
+    localStorage.setItem('stichbros_cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (product: any) => {

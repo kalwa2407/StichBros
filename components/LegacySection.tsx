@@ -13,7 +13,7 @@ export function LegacySection({ timeline }: { timeline: any[] }) {
             <div className="aspect-[4/5] relative overflow-hidden ring-1 ring-accent/20">
                <img 
                   src="/brand/legacy_portraits.png" 
-                  alt="Ancestors of Choice"
+                  alt="Ancestors of StichBros"
                   className="w-full h-full object-cover grayscale sepia-[0.3] contrast-[1.1]"
                />
                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
