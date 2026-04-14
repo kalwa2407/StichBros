@@ -97,7 +97,6 @@ export default function InventoryPage() {
                      {products.map((product, idx) => (
                         <motion.tr 
                           key={product.id}
-                          key={product.id}
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
