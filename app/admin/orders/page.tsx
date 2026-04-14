@@ -1,23 +1,39 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, Search, MapPin, Clock, CreditCard, 
-  Truck, ChevronRight, ExternalLink, MoreVertical
+  Truck, ChevronRight, ExternalLink, Package
 } from 'lucide-react';
+
+type Order = {
+  id: string;
+  customer: string;
+  email: string;
+  destination: string;
+  items: { name: string; qty: number; price: number; image: string }[];
+  itemCount: number;
+  total: number;
+  status: string;
+  date: string;
+  method: string;
+};
 
 export default function OrdersPage() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
-  
-  const initialOrders = [
-    { id: 'ORD-7721', customer: 'Araya Varma', email: 'araya@example.com', destination: 'Mumbai, India', items: 1, total: '₹12,450', status: 'Processing', date: 'Apr 12, 2024 • 10:24 AM', method: 'Credit Card (Visa)' },
-    { id: 'ORD-7720', customer: 'Kabir Singh', email: 'kabir.s@example.com', destination: 'New Delhi, India', items: 2, total: '₹95,200', status: 'Shipped', date: 'Apr 11, 2024 • 04:15 PM', method: 'UPI' },
-    { id: 'ORD-7719', customer: 'Rohan Mehta', email: 'rohan.m@dynasty.co', destination: 'Bangalore, India', items: 3, total: '₹1,54,000', status: 'Delivered', date: 'Apr 10, 2024 • 11:32 AM', method: 'Net Banking' },
-    { id: 'ORD-7718', customer: 'Ishani Roy', email: 'ishani_roy@outlook.com', destination: 'Kolkata, India', items: 1, total: '₹58,000', status: 'Verification', date: 'Apr 09, 2024 • 09:20 PM', method: 'COD (Pending)' },
-  ];
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  const filteredOrders = initialOrders.filter(order => 
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('stichbros_orders') || '[]');
+      setOrders(stored);
+    } catch (e) {
+      setOrders([]);
+    }
+  }, []);
+
+  const filteredOrders = orders.filter(order => 
     (filter === 'All' || order.status === filter) &&
     (order.id.toLowerCase().includes(search.toLowerCase()) || 
      order.customer.toLowerCase().includes(search.toLowerCase()))
@@ -30,6 +46,12 @@ export default function OrdersPage() {
     return { bg: 'rgba(197,160,89,0.1)', color: '#C5A059', border: 'rgba(197,160,89,0.2)' };
   };
 
+  const updateStatus = (orderId: string, newStatus: string) => {
+    const updated = orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+    setOrders(updated);
+    localStorage.setItem('stichbros_orders', JSON.stringify(updated));
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       
@@ -37,7 +59,9 @@ export default function OrdersPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Order Fulfillment</h1>
-          <p style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>4 Orders requiring attention</p>
+          <p style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+            {orders.length === 0 ? 'No orders yet' : `${orders.length} order${orders.length !== 1 ? 's' : ''} total`}
+          </p>
         </div>
         <div style={{ position: 'relative' }}>
           <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#666' }} size={16} />
@@ -51,7 +75,7 @@ export default function OrdersPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
-        {['All', 'Processing', 'Verification', 'Shipped', 'Delivered'].map(status => (
+        {['All', 'Processing', 'Shipped', 'Delivered'].map(status => (
           <button key={status} onClick={() => setFilter(status)} style={{
             padding: '10px 24px', borderRadius: 999, fontSize: 10, fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.15em', whiteSpace: 'nowrap',
@@ -68,62 +92,91 @@ export default function OrdersPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {filteredOrders.length === 0 ? (
           <div style={{ padding: 80, textAlign: 'center', background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24 }}>
-            <ShoppingBag style={{ margin: '0 auto 16px', color: '#444' }} size={48} />
-            <p style={{ color: '#666', fontSize: 14 }}>No orders found.</p>
+            <Package style={{ margin: '0 auto 16px', color: '#444' }} size={48} />
+            <p style={{ color: '#888', fontSize: 16, fontWeight: 600, marginBottom: 4 }}>
+              {orders.length === 0 ? 'No orders yet' : 'No matching orders'}
+            </p>
+            <p style={{ color: '#555', fontSize: 12 }}>
+              {orders.length === 0 ? 'Orders will appear here when customers complete checkout' : 'Try a different filter'}
+            </p>
           </div>
         ) : (
           filteredOrders.map((order) => {
             const sc = statusColor(order.status);
             return (
-              <div key={order.id} style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: 24, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 32 }}
+              <div key={order.id} style={{ background: '#121212', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 20, padding: 24, transition: 'all 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(197,160,89,0.3)')}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)')}
               >
-                {/* ID & Date */}
-                <div style={{ flex: '0 0 160px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                    <ShoppingBag size={18} color="#C5A059" />
-                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{order.id}</span>
+                {/* Top Row */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, background: 'rgba(197,160,89,0.1)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ShoppingBag size={18} color="#C5A059" />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{order.id}</span>
+                      <p style={{ fontSize: 10, color: '#666', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                        <Clock size={10} /> {order.date}
+                      </p>
+                    </div>
                   </div>
-                  <p style={{ fontSize: 10, color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Clock size={10} /> {order.date}
-                  </p>
-                </div>
-
-                {/* Customer */}
-                <div style={{ flex: '0 0 180px' }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 4 }}>{order.customer}</p>
-                  <p style={{ fontSize: 10, color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <CreditCard size={10} /> {order.method}
-                  </p>
-                </div>
-
-                {/* Destination */}
-                <div style={{ flex: '0 0 180px' }}>
-                  <p style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <MapPin size={12} color="#C5A059" /> {order.destination}
-                  </p>
-                  <p style={{ fontSize: 10, color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    {order.items} Items • Secured
-                  </p>
-                </div>
-
-                {/* Price & Status */}
-                <div style={{ flex: '0 0 120px' }}>
-                  <p style={{ fontSize: 18, fontWeight: 700, fontStyle: 'italic', marginBottom: 8 }}>{order.total}</p>
-                  <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
+                  <span style={{ padding: '5px 14px', borderRadius: 999, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
                     {order.status}
                   </span>
                 </div>
 
+                {/* Customer + Items */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{order.customer}</p>
+                    <p style={{ fontSize: 10, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <CreditCard size={10} /> {order.method}
+                    </p>
+                    <p style={{ fontSize: 10, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <MapPin size={10} color="#C5A059" /> {order.destination}
+                    </p>
+                  </div>
+
+                  {/* Items thumbnails */}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {order.items.slice(0, 3).map((item, idx) => (
+                      <div key={idx} style={{ width: 48, height: 60, background: '#0a0a0a', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    ))}
+                    {order.items.length > 3 && (
+                      <div style={{ width: 48, height: 60, background: '#0a0a0a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#888', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        +{order.items.length - 3}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 20, fontWeight: 700, color: '#C5A059' }}>₹{order.total.toLocaleString()}</p>
+                    <p style={{ fontSize: 10, color: '#888' }}>{order.itemCount} item{order.itemCount !== 1 ? 's' : ''}</p>
+                  </div>
+                </div>
+
                 {/* Actions */}
-                <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#666', background: 'none', border: 'none', cursor: 'pointer' }}>
-                    Timeline <ChevronRight size={14} />
-                  </button>
-                  <button style={{ padding: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, cursor: 'pointer', color: '#888' }}>
-                    <ExternalLink size={18} />
-                  </button>
+                <div style={{ display: 'flex', gap: 8, marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 16, flexWrap: 'wrap' }}>
+                  {order.status === 'Processing' && (
+                    <button onClick={() => updateStatus(order.id, 'Shipped')} style={{ padding: '8px 16px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 8, color: '#3b82f6', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Truck size={12} /> Mark Shipped
+                    </button>
+                  )}
+                  {order.status === 'Shipped' && (
+                    <button onClick={() => updateStatus(order.id, 'Delivered')} style={{ padding: '8px 16px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, color: '#22c55e', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Package size={12} /> Mark Delivered
+                    </button>
+                  )}
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    {order.items.map((item, idx) => (
+                      <span key={idx} style={{ fontSize: 10, color: '#666', padding: '6px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>
+                        {item.name} × {item.qty}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
@@ -131,21 +184,22 @@ export default function OrdersPage() {
         )}
       </div>
 
-      {/* Analytics Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #C5A059, #D4B26F)', borderRadius: 28, padding: 32, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.1)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Truck size={32} />
-          </div>
-          <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700 }}>Exporting 14 Orders Today</h3>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', opacity: 0.6 }}>National Heritage Hub • Mumbai Distribution Center</p>
+      {/* Summary Banner */}
+      {orders.length > 0 && (
+        <div style={{ background: 'linear-gradient(135deg, #C5A059, #D4B26F)', borderRadius: 20, padding: 28, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div style={{ width: 52, height: 52, background: 'rgba(0,0,0,0.1)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Truck size={24} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 700 }}>Total Orders: {orders.length}</h3>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', opacity: 0.6 }}>
+                Revenue: ₹{orders.reduce((sum, o) => sum + o.total, 0).toLocaleString()}
+              </p>
+            </div>
           </div>
         </div>
-        <button style={{ background: '#000', color: '#fff', padding: '16px 32px', borderRadius: 16, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4em', cursor: 'pointer', border: 'none' }}>
-          Print Manifests
-        </button>
-      </div>
+      )}
     </div>
   );
 }
